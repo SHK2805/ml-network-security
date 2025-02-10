@@ -36,30 +36,34 @@ def create_project_structure(project_name: str) -> bool:
             "Dockerfile",
             ".dockerignore",
             "docker-compose.yml",
-
             # GitHub actions
             f".github/workflows/main.yml",
-
             # logs
             f"logs/log_{project_name}.log",
-
             # data folder
             f"{data_folder_name}",
-
             # notebooks
             f"notebooks",
-
+            # src folder
             f"src/__init__.py",
             f"src/{project_name}/__init__.py",
             # top folders
             f"src/{project_name}/components/__init__.py",
             f"src/{project_name}/constants/__init__.py",
             f"src/{project_name}/entity/__init__.py",
-            f"src/{project_name}/logging/__init__.py",
-            f"src/{project_name}/exception/__init__.py",
             f"src/{project_name}/pipeline/__init__.py",
-            f"src/{project_name}/utils/__init__.py",
             f"src/{project_name}/cloud/__init__.py",
+            # logging
+            f"src/{project_name}/logging/__init__.py",
+            f"src/{project_name}/logging/logger.py",
+            # exception
+            f"src/{project_name}/exception/__init__.py",
+            f"src/{project_name}/exception/exception.py",
+            # utils
+            f"src/{project_name}/utils/__init__.py",
+            f"src/{project_name}/utils/delete_directories.py",
+            # clean
+            "clean.py",
         ]
 
         for filepath in list_of_files:
