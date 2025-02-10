@@ -1,15 +1,12 @@
 import os
 import sys
-
+from src.network_security.exception.exception import CustomException
+from src.network_security.logging.logger import logger
 from dotenv import load_dotenv
 # Fixing the ImportError
 # ImportError: cannot import name 'MutableMapping' from 'collections'
 # add this before MongoClient import
 import collections
-
-from src.network_security.exception.exception import CustomException
-from src.network_security.logging.logger import logger
-
 # Fixing the ImportError
 collections.Iterable = collections.abc.Iterable
 collections.Mapping = collections.abc.Mapping
