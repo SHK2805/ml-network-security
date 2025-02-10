@@ -24,7 +24,7 @@ def create_file(filepath: Path):
 
 def create_project_structure(project_name: str) -> bool:
     try:
-        data_folder_name: str = "data"
+        data_folder_name: str = "phishingdata"
         list_of_files = [
             # general files
             "template.py",
