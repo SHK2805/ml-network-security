@@ -109,7 +109,7 @@ To manage the repository using Git, follow these steps:
     * Run the command `pip install -r requirements.txt` to install the required packages for MongoDB in your Conda environment
   * Click `Done`
 
-#### Connect to MongoDB Atlas
+#### Test connection to MongoDB Atlas
 * To connect to the MongoDB Atlas cluster using Python, follow these steps:
 * Go to the MongoDB Atlas dashboard.
 * Click on the `Clusters` tab.
@@ -118,30 +118,66 @@ To manage the repository using Git, follow these steps:
 * Select the `Python` driver and the `3.6 or later` version.
 * Under the `Add your connection string into your application code` section, click `View full code sample`.
 * Copy the connection string and replace `<password>` with the password of the database user you created.
-  * Create a new Python script (e.g., `connect_mongodb.py`) in the `scripts` directory.
-  * Add the following code to the script:
-    ```python
-    
-    
-    from pymongo.mongo_client import MongoClient
-    
-    uri = "mongodb+srv://<db_username>:<db_password>@<cluster_name>.3pogr.mongodb.net/?retryWrites=true&w=majority&appName=<cluster_name>"
-    
-    # Create a new client and connect to the server
-    client = MongoClient(uri)
-    
-    # Send a ping to confirm a successful connection
-    try:
-        client.admin.command('ping')
-        print("Pinged your deployment. You successfully connected to MongoDB!")
-    except Exception as e:
-        print(e)
-    ```
-  * Replace `<connection-string>` with the connection string provided in the MongoDB Atlas dashboard.
-  * Run the script using the following command:
-    ```bash
-    python scripts/connect_mongodb.py
-    ```
+* Create a new Python script (e.g., `connect_mongodb.py`) in the `scripts` directory.
+* Add the connection code to the script
+##### Error
+* If you get the below error or similar errors while connecting to MongoDB Atlas, follow these steps:
+* The issue is the deprecation of some aliases from collections.abc into collections from python 3.10.
+* If you can't modify the importations in your scripts because of a third-party import
+* As a temporary workaround you can do the aliases manually before importing the problematic third-party lib. 
+```bash
+ImportError: cannot import name 'MutableMapping' from 'collections'
+```
+* Check the python version and the collections module using the following code:
+```python
+import sys
+print(sys.version)
+import collections
+print(dir(collections))
+```
+* If the collections have **'_collections_abc'** folder then add the below
+* If the python version is 3.10 and the collections module does not have the following attributes:
+  * MutableMapping
+  * MutableSequence
+  * MutableSet
+  * Sequence
+  * Mapping
+  * Iterable
+* Add the following code to the script to fix it before importing the pymongo module `from pymongo.mongo_client import MongoClient`:
+```python
+import collections
+collections.Iterable = collections.abc.Iterable
+collections.Mapping = collections.abc.Mapping
+collections.MutableSet = collections.abc.MutableSet
+collections.MutableMapping = collections.abc.MutableMapping
+collections.Sequence = collections.abc.Sequence
+```
+* Connect to MongoDB Atlas
+```python
+import collections
+collections.Iterable = collections.abc.Iterable
+collections.Mapping = collections.abc.Mapping
+collections.MutableSet = collections.abc.MutableSet
+collections.MutableMapping = collections.abc.MutableMapping
+collections.Sequence = collections.abc.Sequence
+from pymongo.mongo_client import MongoClient
+
+uri = "mongodb+srv://<db_username>:<db_password>@<db_clustername>.3pogr.mongodb.net/?retryWrites=true&w=majority&appName=<db_clustername>"
+
+# Create a new client and connect to the server
+client = MongoClient(uri)
+
+# Send a ping to confirm a successful connection
+try:
+    client.admin.command('ping')
+    print("Pinged your deployment. You successfully connected to MongoDB!")
+except Exception as e:
+    print(e)
+```
+* Run the script using the following command:
+```bash
+python scripts/test_mongodb_connection.py
+```
     
 
 
