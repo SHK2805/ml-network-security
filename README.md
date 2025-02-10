@@ -176,7 +176,7 @@ except Exception as e:
 ```
 * Run the script using the following command:
 ```bash
-python scripts/test_mongodb_connection.py
+python scripts/check_mongodb_connection.py
 ```
     
 
