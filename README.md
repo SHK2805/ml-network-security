@@ -219,6 +219,7 @@ pip install --upgrade pymongo
 * Constants
 * Configuration
 * Entity
+* Components
 
 
 ## Coding Files
@@ -246,6 +247,8 @@ pip install --upgrade pymongo
     * collection_name
     * database_name
     * train_test_split_ratio
+* **Step5**: Add **DataIngestion** class to `components/data_ingestion.py` file
+  * In here we create `DataIngestion` class
     
 
 

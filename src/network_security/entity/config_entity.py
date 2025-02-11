@@ -3,7 +3,7 @@ from src.network_security.constants import training_pipeline
 from src.network_security.config.configuration import TrainingPipelineConfig
 
 
-class DataIngestion:
+class DataIngestionConfig:
     def __init__(self, training_pipeline_config: TrainingPipelineConfig):
         self.class_name = self.__class__.__name__
         self.data_ingestion_dir = os.path.join(training_pipeline_config.artifact_dir, training_pipeline.data_ingestion_dir_name)

@@ -7,6 +7,9 @@ from dotenv import load_dotenv
 # ImportError: cannot import name 'MutableMapping' from 'collections'
 # add this before MongoClient import
 import collections
+
+from src.network_security.utils.environment import get_mongodb_uri
+
 # Fixing the ImportError
 collections.Iterable = collections.abc.Iterable
 collections.Mapping = collections.abc.Mapping
@@ -24,9 +27,9 @@ class MongoDBConnector:
         """Loads environment variables from a .env file."""
         load_dotenv()
 
-    def get_mongo_uri(self):
+    def get_mongodb_uri(self):
         """Retrieves the MongoDB URI from environment variables."""
-        return os.getenv("ATLAS_MONGODB_URI")
+        return get_mongodb_uri()
 
     def create_mongo_client(self, uri):
         """Creates and returns a MongoDB client."""
@@ -43,7 +46,7 @@ class MongoDBConnector:
 
     def connect(self):
         self.load_env()
-        uri = self.get_mongo_uri()
+        uri = self.get_mongodb_uri()
         self.create_mongo_client(uri)
         self.ping_mongo_client()
 

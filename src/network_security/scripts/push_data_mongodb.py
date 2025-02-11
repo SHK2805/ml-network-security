@@ -12,6 +12,9 @@ from src.network_security.constants import database_name, collection_name, data_
 
 # Fixing the ImportError
 import collections
+
+from src.network_security.utils.environment import get_mongodb_uri
+
 collections.Iterable = collections.abc.Iterable
 collections.Mapping = collections.abc.Mapping
 collections.MutableSet = collections.abc.MutableSet
@@ -40,7 +43,7 @@ class NetworkDataExtract:
 
     def get_mongodb_uri(self):
         """Retrieves the MongoDB URI from environment variables."""
-        return os.getenv("ATLAS_MONGODB_URI")
+        return get_mongodb_uri()
 
     def read_csv(self, file_path):
         tag: str = self.class_name + "::read_csv"

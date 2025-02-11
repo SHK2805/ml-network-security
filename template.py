@@ -59,6 +59,7 @@ def create_project_structure(project_name: str) -> bool:
             # utils
             f"src/{project_name}/utils/__init__.py",
             f"src/{project_name}/utils/delete_directories.py",
+            f"src/{project_name}/utils/environment.py",
             # scripts
             f"src/{project_name}/scripts/__init__.py",
             f"src/{project_name}/scripts/check_mongodb_connection.py",
