@@ -7,6 +7,8 @@
 - [Environment File](#environment-file)
 - [Libraries Used](#libraries-used)
 - [Database MongoDB](#database-mongodb)
+- [Coding Steps](#coding-steps)
+- [Coding Files](#coding-files)
 
 ## Setup Conda Environment
 To set up the Conda environment for this project, follow these steps:
@@ -212,6 +214,38 @@ pip install --upgrade pymongo
   * Click on the `Browse Collections` tab.
   * Click on the required collection here `phishingdata`.
   * You should see the data uploaded to the collection.
+
+## Coding Steps
+* Constants
+* Configuration
+* Entity
+
+
+## Coding Files
+* **Step1**: Add constants to `constants/__init__.py` file
+* **Step2**: Add **GENERAL** and **DATA INGESTION** constants to `constants/training_pipeline/__init__.py` file
+* **Step3**: Add **TrainingPipelineConfig** class to `config/configuration.py` file
+* **Step4**: Add **DataIngestion** class to `entity/config_entity.py` file
+  * In here we create `DataIngestion` class with the below attributes as class variables
+  * These variables contain the folder and file paths for the data ingestion process
+    * data_ingestion_dir
+    * feature_store_file_path
+    * training_file_path
+    * testing_file_path
+  * Using the above variables we create below file structure
+  ```plaintext
+  artifacts
+  └── data_ingestion
+      ├── feature_store
+      │   └── phisingData.csv
+      └── ingested
+          ├── train_data.csv
+          └── test_data.csv
+  ```
+  * We also add database and collection name as class variables
+    * collection_name
+    * database_name
+    * train_test_split_ratio
     
 
 

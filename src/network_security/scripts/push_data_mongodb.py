@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from pymongo.mongo_client import MongoClient
 from src.network_security.exception.exception import CustomException
 from src.network_security.logging.logger import logger
+from src.network_security.constants import database_name, collection_name, data_file_name, data_file_folder_name
 
 # Fixing the ImportError
 import collections
@@ -18,11 +19,11 @@ collections.MutableMapping = collections.abc.MutableMapping
 collections.Sequence = collections.abc.Sequence
 
 class NetworkDataExtract:
-    def __init__(self, database_name="phishing_data", collection_name="phishing_data"):
+    def __init__(self, input_database_name=database_name, input_collection_name=collection_name):
         self.class_name = self.__class__.__name__
         self.client = None
-        self.database_name = database_name
-        self.collection_name = collection_name
+        self.database_name = input_database_name
+        self.collection_name = input_collection_name
         self.collection = None
         self.database = None
         self.records = None
@@ -90,9 +91,7 @@ class NetworkDataExtract:
                 self.client.close()
                 logger.info(f"{tag}::MongoDB connection closed.")
 
-    def process(self, file_path, database_name, collection_name):
-        self.database_name = database_name
-        self.collection_name = collection_name
+    def process(self, file_path):
         records = self.cv_to_json(file_path)
         self.connect_to_mongodb()
         count = self.insert_data_mongodb(records)
@@ -102,14 +101,14 @@ class NetworkDataExtract:
 def main():
     tag: str = "push_data_mongodb::main"
     try:
-        file_path = os.path.join(Path(__file__).parent.parent.parent.parent, Path("phishingdata", "phisingData.csv"))
+        file_path = os.path.join(Path(__file__).parent.parent.parent.parent, Path(data_file_folder_name, data_file_name))
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"{tag}::File not found: {file_path}")
         database_name = "phishing_data"
         collection_name = "phishing_data"
 
         obj = NetworkDataExtract()
-        count = obj.process(file_path, database_name, collection_name)
+        count = obj.process(file_path)
         logger.info(f"{tag}::Records inserted into MongoDB successfully. Total records: {count}")
     except Exception as e:
         logger.error(f"{tag}::Error in pushing data into MongoDB: {e}")

@@ -48,9 +48,6 @@ def create_project_structure(project_name: str) -> bool:
             f"src/__init__.py",
             f"src/{project_name}/__init__.py",
             # top folders
-            f"src/{project_name}/components/__init__.py",
-            f"src/{project_name}/constants/__init__.py",
-            f"src/{project_name}/entity/__init__.py",
             f"src/{project_name}/pipeline/__init__.py",
             f"src/{project_name}/cloud/__init__.py",
             # logging
@@ -68,6 +65,18 @@ def create_project_structure(project_name: str) -> bool:
             f"src/{project_name}/scripts/push_data_mongodb.py",
             # clean
             "clean.py",
+            # components
+            f"src/{project_name}/components/__init__.py",
+            f"src/{project_name}/components/data_ingestion.py",
+            # entity
+            f"src/{project_name}/entity/__init__.py",
+            f"src/{project_name}/entity/config_entity.py",
+            # config
+            f"src/{project_name}/config/__init__.py",
+            f"src/{project_name}/config/configuration.py",
+            # constants
+            f"src/{project_name}/constants/__init__.py",
+            f"src/{project_name}/constants/training_pipeline/__init__.py",
         ]
 
         for filepath in list_of_files:
