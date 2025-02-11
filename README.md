@@ -4,6 +4,8 @@
 - [Setup Conda Environment](#setup-conda-environment)
 - [Using Git](#using-git)
 - [Data](#data)
+- [Environment File](#environment-file)
+- [Libraries Used](#libraries-used)
 - [Database MongoDB](#database-mongodb)
 
 ## Setup Conda Environment
@@ -85,6 +87,23 @@ To manage the repository using Git, follow these steps:
 ## Data
 * The data is stored in the `phishingdata` directory.
 * The data is stored in the CSV format in the `phishingdata.csv` file.
+
+## Environment File
+* Create a new environment file (`.env`) in the root directory.
+* This contains the environment variables for the below: 
+  * MongoDB connection
+* We can use the `python-dotenv` package to load the environment variables from the `.env` file.
+* Use the below code to load the environment variables from the `.env` file:
+```python
+from dotenv import load_dotenv
+import os
+# Load the environment variables from the .env file
+load_dotenv()
+var = os.getenv("VAR_NAME")
+```
+
+## Libraries Used
+* **Certifi** is used to provide Mozilla’s carefully curated collection of Root Certificates for validating the trustworthiness of SSL certificates while verifying the identity of TLS hosts.
 
 ## Database MongoDB
 
@@ -178,6 +197,21 @@ except Exception as e:
 ```bash
 python scripts/check_mongodb_connection.py
 ```
+* If you get the error `The client driver may require an upgrade`, then upgrade the `pymongo` package using the following command:
+```bash
+pip install --upgrade pymongo
+```
+
+#### Upload data to MongoDB Atlas
+* To upload data to the MongoDB Atlas cluster using Python, follow these steps:
+* Create a new Python script `push_data_mongodb.py` in the `scripts` directory.
+* Add the code to upload the data to the MongoDB Atlas cluster.
+* To check if the data is uploaded successfully, follow these steps:
+  * Go to the MongoDB Atlas dashboard.
+  * Click on the `Clusters` tab.
+  * Click on the `Browse Collections` tab.
+  * Click on the required collection here `phishingdata`.
+  * You should see the data uploaded to the collection.
     
 
 
