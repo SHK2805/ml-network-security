@@ -2,6 +2,7 @@ python-dotenv
 pandas
 numpy
 scikit-learn
+scipy
 # pymongo[srv]==3.6
 pymongo[srv]
 pymongo
@@ -10,4 +11,5 @@ certifi
 setuptools
 pyyaml
 pathlib
+dill
 # -e .

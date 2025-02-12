@@ -228,11 +228,13 @@ pip install --upgrade pymongo
 
 
 ## Coding Files
+### Data Ingestion
+* For data ingestion we read the data from the `MongoDB` database, split and save them into `CSV` files
 * **Step1**: Add constants to `constants/__init__.py` file
 * **Step2**: Add **GENERAL** and **DATA INGESTION** constants to `constants/training_pipeline/__init__.py` file
 * **Step3**: Add **TrainingPipelineConfig** class to `config/configuration.py` file
-* **Step4**: Add **DataIngestion** class to `entity/config_entity.py` file
-  * In here we create `DataIngestion` class with the below attributes as class variables
+* **Step4**: Add **DataIngestionConfig** class to `entity/config_entity.py` file
+  * In here we create `DataIngestionConfig` class with the below attributes as class variables
   * These variables contain the folder and file paths for the data ingestion process
     * data_ingestion_dir
     * feature_store_file_path
@@ -240,11 +242,11 @@ pip install --upgrade pymongo
     * testing_file_path
   * Using the above variables we create below file structure
   ```plaintext
-  artifacts
-  └── data_ingestion
-      ├── feature_store
+  artifacts/
+  └── data_ingestion/
+      ├── feature_store/
       │   └── phisingData.csv
-      └── ingested
+      └── ingested/
           ├── train_data.csv
           └── test_data.csv
   ```
@@ -256,6 +258,51 @@ pip install --upgrade pymongo
 * **Step6**: Add **DataIngestion** class to `components/data_ingestion.py` file
   * In here we create `DataIngestion` class
 * **Step7**: Add **DataIngestion** class to `pipeline/data_ingestion.py` file
+* **Step8**: Add the pipeline to the `main.py` file and run the pipeline
+
+### Data Validation
+#### Schema Validation
+* Schema validation allows you to define the structure of data columns and numerical columns in each collection.
+* Add `data_schema/schema.yaml` file with the below sections
+  * columns
+    * Contains the column names and their data types
+  * numerical_columns
+    * Contains the numerical column names
+* We use this file to validate our data after data ingestion as part of the data validation process
+#### Other validations
+* Below are some of the various things we do to validate the data
+  * Schema Validation
+  * Data drift
+    * Data drift refers to the changes in data distribution over time, which can affect the performance of machine learning models
+    * When the data that a model was trained on no longer represents the real-world data it is currently exposed to, the model's predictions can become less accurate or even invalid.
+    * There are two primary types of data drift:
+      * **Covariate Shift**: The distribution of the input features changes over time.
+      * **Concept Drift**: The relationship between the input features and the target variable changes over time.
+  * Number of columns
+  * Check numerical columns
+#### Coding Steps
+* **Step1**: Add **schema file path** and  **DATA VALIDATION** constants to `constants/training_pipeline/__init__.py` file
+* **Step2**: Add **DataValidationConfig** class to `entity/config_entity.py` file
+  * In here we create `DataValidationConfig` class with as class variables for valid, invalid and drift report folders
+  * Using the above variables we create below file structure
+  ```plaintext
+    artifacts/
+    ├── data_validation/
+    │   ├── validated/
+    │   │   ├── train_data.csv
+    │   │   └── test_data.csv
+    │   ├── invalid/
+    │   │   ├── train_data.csv
+    │   │   └── test_data.csv
+    │   └── drift_report/
+    │       └── drift_report.yaml
+
+  ```
+* **Step3**: Add **DataValidationArtifact** class to `entity/artifact_entity.py` file with paths to test and train data
+* **Step4**: Add **DataValidation** class to `components/data_validation.py` file
+  * In here we create `DataValidation` class
+* **Step5**: Add **DataValidation** class to `pipeline/data_validation.py` file
+* **Step6**: Add the pipeline to the `main.py` file and run the pipeline
     
 
 

@@ -1,8 +1,5 @@
-import os.path
 from pathlib import Path
-
 from src.network_security.utils.delete_directories import delete_directories
-
 
 def clean():
     try:
@@ -11,7 +8,6 @@ def clean():
         # delete the folders
         delete_directories(paths)
         print(f"Cleaned up the project directories")
-
     except Exception as e:
         raise e
 
