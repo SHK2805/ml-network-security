@@ -1,4 +1,3 @@
-import os
 import sys
 from src.network_security.exception.exception import CustomException
 from src.network_security.logging.logger import logger

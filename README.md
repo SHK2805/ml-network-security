@@ -219,7 +219,11 @@ pip install --upgrade pymongo
 * Constants
 * Configuration
 * Entity
+  * Config Entity
+* Entity
+  * Artifact Entity
 * Components
+* Main
 
 
 ## Coding Files
@@ -249,6 +253,7 @@ pip install --upgrade pymongo
     * train_test_split_ratio
 * **Step5**: Add **DataIngestion** class to `components/data_ingestion.py` file
   * In here we create `DataIngestion` class
+* **Step6**: Add **DataIngestionArtifact** class to `entity/artifact_entity.py` file with paths to test and train data
     
 
 

@@ -33,9 +33,12 @@ def create_project_structure(project_name: str) -> bool:
             ".gitignore",
             "requirements.txt",
             "README.md",
+            # docker
             "Dockerfile",
             ".dockerignore",
             "docker-compose.yml",
+            # main
+            "main.py",
             # GitHub actions
             f".github/workflows/main.yml",
             # logs
@@ -72,6 +75,7 @@ def create_project_structure(project_name: str) -> bool:
             # entity
             f"src/{project_name}/entity/__init__.py",
             f"src/{project_name}/entity/config_entity.py",
+            f"src/{project_name}/entity/artifact_entity.py",
             # config
             f"src/{project_name}/config/__init__.py",
             f"src/{project_name}/config/configuration.py",
