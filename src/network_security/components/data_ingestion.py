@@ -7,12 +7,10 @@ from sklearn.model_selection import train_test_split
 # load from env
 from dotenv import load_dotenv
 
-from src.network_security.config.configuration import TrainingPipelineConfig
 from src.network_security.entity.artifact_entity import DataIngestionArtifact
 from src.network_security.entity.config_entity import DataIngestionConfig
 from src.network_security.exception.exception import CustomException
 from src.network_security.logging.logger import logger
-from src.network_security.utils.environment import get_mongodb_uri
 
 # Fixing the ImportError
 # ImportError: cannot import name 'MutableMapping' from 'collections'

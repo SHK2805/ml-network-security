@@ -37,8 +37,6 @@ def create_project_structure(project_name: str) -> bool:
             "Dockerfile",
             ".dockerignore",
             "docker-compose.yml",
-            # main
-            "main.py",
             # GitHub actions
             f".github/workflows/main.yml",
             # logs
@@ -50,8 +48,7 @@ def create_project_structure(project_name: str) -> bool:
             # src folder
             f"src/__init__.py",
             f"src/{project_name}/__init__.py",
-            # top folders
-            f"src/{project_name}/pipeline/__init__.py",
+            # cloud
             f"src/{project_name}/cloud/__init__.py",
             # logging
             f"src/{project_name}/logging/__init__.py",
@@ -69,19 +66,24 @@ def create_project_structure(project_name: str) -> bool:
             f"src/{project_name}/scripts/push_data_mongodb.py",
             # clean
             "clean.py",
-            # components
-            f"src/{project_name}/components/__init__.py",
-            f"src/{project_name}/components/data_ingestion.py",
+            # constants
+            f"src/{project_name}/constants/__init__.py",
+            f"src/{project_name}/constants/training_pipeline/__init__.py",
+            # config
+            f"src/{project_name}/config/__init__.py",
+            f"src/{project_name}/config/configuration.py",
             # entity
             f"src/{project_name}/entity/__init__.py",
             f"src/{project_name}/entity/config_entity.py",
             f"src/{project_name}/entity/artifact_entity.py",
-            # config
-            f"src/{project_name}/config/__init__.py",
-            f"src/{project_name}/config/configuration.py",
-            # constants
-            f"src/{project_name}/constants/__init__.py",
-            f"src/{project_name}/constants/training_pipeline/__init__.py",
+            # components
+            f"src/{project_name}/components/__init__.py",
+            f"src/{project_name}/components/data_ingestion.py",
+            # pipeline
+            f"src/{project_name}/pipeline/__init__.py",
+            f"src/{project_name}/pipeline/data_ingestion.py",
+            # main
+            "main.py",
         ]
 
         for filepath in list_of_files:
