@@ -1,13 +1,17 @@
 import sys
+from typing import Any
+
 import pandas as pd
 import os
+from pandas import DataFrame
+
 from src.network_security.constants.training_pipeline import schema_file_path
 from src.network_security.entity.artifact_entity import DataIngestionArtifact, DataValidationArtifact
 from src.network_security.entity.config_entity import DataValidationConfig
 from src.network_security.exception.exception import CustomException
 from src.network_security.logging.logger import logger
 from scipy.stats import ks_2samp
-from src.network_security.utils.main_utils.utils import read_yaml
+from src.network_security.utils.main_utils.utils import read_yaml, write_yaml
 
 
 class DataValidation:
@@ -73,6 +77,114 @@ class DataValidation:
             logger.error(f"{tag}::Error validating columns: {e}")
             raise CustomException(e, sys)
 
+    def validate_numerical_columns(self, data: pd.DataFrame) -> bool:
+        tag: str = f"{self.class_name}::validate_numerical_columns::"
+        try:
+            numerical_columns = self._schema_config['numerical_columns']
+            data_columns_list = list(data.columns)
+            missing_columns = [col for col in numerical_columns if col not in data_columns_list]
+            if missing_columns:
+                logger.error(f"{tag}::Missing numerical columns in data: {missing_columns}")
+                return False
+            logger.info(f"{tag}::All numerical columns are validated")
+            return True
+        except Exception as e:
+            logger.error(f"{tag}::Error validating numerical columns: {e}")
+            raise CustomException(e, sys)
+
+    def validate_train_test_data(self, train_data: pd.DataFrame, test_data: pd.DataFrame) -> bool:
+        tag: str = f"{self.class_name}::validate_data::"
+        # validate number of columns in train and test data
+        logger.info(f"{tag}::Validating number of columns in train and test data")
+        is_train_test_columns_numbers_same = self.validate_number_of_columns_in_data(train_data, test_data)
+        if not is_train_test_columns_numbers_same:
+            logger.error(f"{tag}::Data validation failed. Train and Test data have different number of columns")
+
+        logger.info(f"{tag}::Validating number of columns in train data")
+        is_columns_numbers_same_train = self.validate_number_of_columns(train_data)
+        if not is_columns_numbers_same_train:
+            logger.error(f"{tag}::Data validation failed. Train data has different number of columns")
+
+        logger.info(f"{tag}::Validating number of columns in test data")
+        is_columns_numbers_same_test = self.validate_number_of_columns(test_data)
+        if not is_columns_numbers_same_test:
+            logger.error(f"{tag}::Data validation failed. Test data has different number of columns")
+
+        logger.info(f"{tag}::Validating numerical columns in train data")
+        is_numerical_columns_same_train = self.validate_numerical_columns(train_data)
+        if not is_numerical_columns_same_train:
+            logger.error(f"{tag}::Data validation failed. Train data numerical columns are not same as schema")
+
+        logger.info(f"{tag}::Validating numerical columns in test data")
+        is_numerical_columns_same_test = self.validate_numerical_columns(test_data)
+        if not is_numerical_columns_same_test:
+            logger.error(f"{tag}::Data validation failed. Test data numerical columns are not same as schema")
+
+        return (is_train_test_columns_numbers_same and
+                  is_columns_numbers_same_train and
+                  is_columns_numbers_same_test and
+                  is_numerical_columns_same_train and
+                  is_numerical_columns_same_test)
+
+    def generate_drift_report(self, reference_data: pd.DataFrame, new_data: pd.DataFrame) -> tuple[
+        DataFrame | Any, bool]:
+        """
+        Generate a drift report comparing two datasets.
+
+        Parameters:
+            reference_data (pd.DataFrame): The reference dataset (e.g., training data).
+            new_data (pd.DataFrame): The new dataset to compare against the reference.
+
+        Returns:
+            pd.DataFrame: A drift report showing the KS statistic and p-value for each feature.
+        """
+        tag = f"{self.class_name}::generate_drift_report::"
+        report = pd.DataFrame(columns=['Feature', 'KS Statistic', 'P-Value', 'Drift Detected'])
+        threshold = 0.005
+        drift_detected_overall = False
+
+        for column in reference_data.columns:
+            if column in new_data.columns:
+                stat, p_value = ks_2samp(reference_data[column], new_data[column])
+                drift_detected = p_value < threshold
+                drift_detected_overall = drift_detected_overall or drift_detected
+                report = report.append({
+                    'Feature': column,
+                    'KS Statistic': stat,
+                    'P-Value': p_value,
+                    'Drift Detected': drift_detected
+                }, ignore_index=True)
+
+        status = not drift_detected_overall
+        logger.info(f"{tag}::Drift report generated with status: {status}")
+        return report, status
+
+    def save_report_to_yaml(self, report: pd.DataFrame, status: bool, file_name: str = None):
+        """
+        Save the drift report to a YAML file.
+
+        Parameters:
+            report (pd.DataFrame): The drift report as a DataFrame.
+            status (bool): The overall status indicating whether drift was detected.
+            file_name (str): The name of the YAML file.
+        """
+        tag = f"{self.class_name}::save_report_to_yaml::"
+        report_dict = report.to_dict(orient='records')
+        data = {
+            'status': status,
+            'report': report_dict
+        }
+        # create directory if not exists
+        drift_dir = self.data_validation_config.drift_report_dir
+        drift_file_name = file_name
+        if drift_file_name is None:
+            drift_file_name = self.data_validation_config.drift_report_file
+        os.makedirs(drift_dir, exist_ok=True)
+        logger.info(f"{tag}::Folder created: {drift_dir}")
+        write_yaml(file_path=drift_file_name, content=data)
+        logger.info(f"{tag}::Drift report saved to {drift_file_name}")
+
+
     def initiate_data_validation(self) -> DataValidationArtifact:
         tag: str = f"{self.class_name}::initiate_data_validation::"
         try:
@@ -85,44 +197,37 @@ class DataValidation:
             train_data = DataValidation.read_data(train_file_path)
             test_data = DataValidation.read_data(test_file_path)
 
-            # validate number of columns in train and test data
-            logger.info(f"{tag}::Validating number of columns in train and test data")
-            is_columns_numbers_same = self.validate_number_of_columns_in_data(train_data, test_data)
-            if not is_columns_numbers_same:
-                logger.error(f"{tag}::Data validation failed. Train and Test data have different number of columns")
-
-            logger.info(f"{tag}::Validating number of columns in train data")
-            is_columns_numbers_same_train = self.validate_number_of_columns(train_data)
-            if not is_columns_numbers_same_train:
-                logger.error(f"{tag}::Data validation failed. Train data has different number of columns")
-
-            logger.info(f"{tag}::Validating number of columns in test data")
-            is_columns_numbers_same_test = self.validate_number_of_columns(test_data)
-            if not is_columns_numbers_same_test:
-                logger.error(f"{tag}::Data validation failed. Test data has different number of columns")
-
-            logger.info(f"{tag}::Validating columns in train data")
-            is_columns_same_train = self.validate_columns(train_data)
-            if not is_columns_same_train:
-                logger.error(f"{tag}::Data validation failed. Train data columns are not same as schema")
-
-            logger.info(f"{tag}::Validating columns in test data")
-            is_columns_same_test = self.validate_columns(test_data)
-            if not is_columns_same_test:
-                logger.error(f"{tag}::Data validation failed. Test data columns are not same as schema")
-
-            status = (is_columns_numbers_same and
-                      is_columns_numbers_same_train and
-                      is_columns_numbers_same_test and
-                      is_columns_same_train and
-                      is_columns_same_test)
-
+            # validate train and test data
+            status = self.validate_train_test_data(train_data, test_data)
             if not status:
                 logger.error(f"{tag}::Data validation failed.")
                 logger.error(f"{tag}::Data columns are not same as schema")
                 raise CustomException("Data validation failed", sys)
 
             logger.info(f"{tag}::Data validation completed successfully")
+
+            drift_report, status = self.generate_drift_report(train_data, test_data)
+            self.save_report_to_yaml(drift_report, status)
+            logger.info(f"{tag}::Drift report saved successfully")
+
+            # save test and train data
+            valid_data_dir = self.data_validation_config.valid_data_dir
+            # create directory if not exists
+            os.makedirs(valid_data_dir, exist_ok=True)
+            logger.info(f"{tag}::Folder created: {valid_data_dir}")
+            train_data.to_csv(self.data_validation_config.valid_train_file_path, index=False, header=True)
+            test_data.to_csv(self.data_validation_config.valid_test_file_path, index=False, header=True)
+            logger.info(f"{tag}::Validated data saved to csv successfully")
+
+            # create data validation artifact
+            data_validation_artifact = DataValidationArtifact(
+                validation_status=status,
+                drift_report_file_path=self.data_validation_config.drift_report_file,
+                valid_train_file_path=self.data_validation_config.valid_train_file_path,
+                valid_test_file_path=self.data_validation_config.valid_test_file_path,
+                invalid_test_file_path=self.data_validation_config.invalid_test_file_path,
+                invalid_train_file_path=self.data_validation_config.invalid_train_file_path)
+
             return data_validation_artifact
         except Exception as e:
             logger.error(f"{tag}::Error running the data validation pipeline: {e}")
