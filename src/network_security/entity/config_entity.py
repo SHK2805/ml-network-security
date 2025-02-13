@@ -73,5 +73,14 @@ class DataTransformationConfig:
         #       - transformed_object
         #           - preprocessing.pkl
 
+class ModelTrainerConfig:
+    def __init__(self, training_pipeline_config: TrainingPipelineConfig):
+        self.class_name = self.__class__.__name__
+        self.model_trainer_dir = os.path.join(training_pipeline_config.artifact_dir, training_pipeline.model_trainer_dir_name)
+        self.trained_model_file_path = os.path.join(self.model_trainer_dir, training_pipeline.model_trainer_trained_model_dir,
+                                                        training_pipeline.model_trainer_trained_model_file_name)
+        self.expected_accuracy = training_pipeline.model_trainer_expected_score
+        self.overfitting_underfitting_threshold = training_pipeline.model_trainer_over_fitting_under_fitting_threshold
+
 
 

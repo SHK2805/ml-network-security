@@ -50,7 +50,7 @@ def load_object(file_path: str, ) -> object:
 def save_numpy_array_data(file_path: str, array: np.array):
     """
     Save numpy array data to file
-    file_path: str location of file to save
+    file_path: str location of a file to save
     array: np.array data to save
     """
     try:
@@ -64,7 +64,7 @@ def save_numpy_array_data(file_path: str, array: np.array):
 def load_numpy_array_data(file_path: str) -> np.array:
     """
     load numpy array data from file
-    file_path: str location of file to load
+    file_path: str location of a file to load
     return: np.array data loaded
     """
     try:

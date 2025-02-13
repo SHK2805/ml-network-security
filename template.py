@@ -58,8 +58,16 @@ def create_project_structure(project_name: str) -> bool:
             f"src/{project_name}/exception/exception.py",
             # utils
             f"src/{project_name}/utils/__init__.py",
+            # main utils
             f"src/{project_name}/utils/main_utils/__init__.py",
             f"src/{project_name}/utils/main_utils/utils.py",
+            # ml utils
+            f"src/{project_name}/utils/ml_utils/__init__.py",
+            f"src/{project_name}/utils/ml_utils/metric/__init__.py",
+            f"src/{project_name}/utils/ml_utils/metric/classification_metrics.py",
+            f"src/{project_name}/utils/ml_utils/model/__init__.py",
+            f"src/{project_name}/utils/ml_utils/model/estimator.py",
+            # other utils
             f"src/{project_name}/utils/delete_directories.py",
             f"src/{project_name}/utils/environment.py",
             # scripts
@@ -68,6 +76,8 @@ def create_project_structure(project_name: str) -> bool:
             f"src/{project_name}/scripts/push_data_mongodb.py",
             # schema
             f"data_schema/schema.yaml",
+            # hyperparameter tuning
+            f"model_params/model_params.yaml",
             # clean
             "clean.py",
             # constants
@@ -85,6 +95,7 @@ def create_project_structure(project_name: str) -> bool:
             f"src/{project_name}/components/data_ingestion.py",
             f"src/{project_name}/components/data_validation.py",
             f"src/{project_name}/components/data_transformation.py",
+            f"src/{project_name}/components/model_trainer.py",
             # pipeline
             f"src/{project_name}/pipeline/__init__.py",
             f"src/{project_name}/pipeline/data_ingestion.py",

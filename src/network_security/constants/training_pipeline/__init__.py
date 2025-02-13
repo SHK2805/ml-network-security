@@ -13,6 +13,7 @@ file_name: str = data_file_name
 train_file_name: str = "train_data.csv"
 test_file_name: str = "test_data.csv"
 schema_file_path: str = os.path.join("data_schema", "schema.yaml")
+model_params_file_path: str = os.path.join("model_params", "model_params.yaml")
 
 # DATA INGESTION CONSTANTS
 data_ingestion_collection_name: str = collection_name
@@ -43,3 +44,11 @@ data_transformation_imputer_params: dict = {
     "n_neighbors": 3,
     "weights": "uniform",
 }
+
+# MODEL TRAINER CONSTANTS
+model_trainer_dir_name: str = "model_trainer"
+model_trainer_trained_model_dir: str = "trained_model"
+model_trainer_saved_model_dir: str = "saved_models"
+model_trainer_trained_model_file_name: str = "model.pkl"
+model_trainer_expected_score: float = 0.6
+model_trainer_over_fitting_under_fitting_threshold: float = 0.05

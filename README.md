@@ -1,17 +1,21 @@
 # Network Security System
 
 ## Table of Contents
+- [Notes](#notes)
 - [Setup Conda Environment](#setup-conda-environment)
 - [Using Git](#using-git)
 - [Data](#data)
 - [Environment File](#environment-file)
 - [Libraries Used](#libraries-used)
 - [Database MongoDB](#database-mongodb)
+- [Classifiers](#classifiers)
+- [Metrics](#metrics)
 - [Coding Steps](#coding-steps)
 - [Coding Files](#coding-files)
 - [Data Ingestion](#data-ingestion)
 - [Data Validation](#data-validation)
 - [Data Transformation](#data-transformation)
+- [Model Trainer](#model-trainer)
 
 ## Notes
 * If you have added `.github/workflows/main.yml` then disable the workflows in the GitHub repository settings till the correct code is added
@@ -118,15 +122,15 @@ var = os.getenv("VAR_NAME")
 #### Create a MongoDB Atlas Account
 * We have used MongoDB to store the data.
 * The database is created using **MongoDB Atlas** cloud.
-* MongoDB Atlas is a fully-managed cloud database service that makes it easy to deploy, operate, and scale MongoDB databases.
+* MongoDB Atlas is a fully managed cloud database service that makes it easy to deploy, operate, and scale MongoDB databases.
 * Steps
   * Create a MongoDB Atlas account.
-  * Deploy your cluster with below options
+  * Deploy your cluster with the below options
     * Tier: Free
     * Name: Cluster0
     * Cloud Provider & Region: AWS & us-east-1
   * Click `Create Deployment`
-  * * Whitelist your IP address (this is automatically done for you)
+  * Allowlist your IP address (this is automatically done for you)
   * Create a database user
     * Give username and password and click `Create Database User`
   * Click `Choose a connection method`
@@ -221,6 +225,66 @@ pip install --upgrade pymongo
   * Click on the required collection here `phishingdata`.
   * You should see the data uploaded to the collection.
 
+### Classifiers
+* We use the following algorithms to train the model:
+* This is defined in the `ModelTrainer` class in the `components/model_trainer.py` file
+* **Logistic Regression**: A statistical model that uses a logistic function to model a binary dependent variable, making predictions based on the probability of a certain class or event.
+* **Decision Tree Classifier**: A flowchart-like tree structure where internal nodes represent features (or attributes), branches represent decision rules, and each leaf node represents an outcome.
+* **K-Nearest Neighbors (KNN) Classifier**: A simple, instance-based learning algorithm that classifies new cases based on a majority vote of its neighbors, with the case being assigned to the class most common among its K nearest neighbors.
+* **Random Forest Classifier**: An ensemble learning method that constructs a multitude of decision trees during training and outputs the class that is the mode of the classes or the mean prediction of the individual trees.
+* **Gradient Boosting Classifier**: A machine learning technique for regression and classification problems that produces a prediction model in the form of an ensemble of weak prediction models, typically decision trees, optimized to reduce errors in a step-by-step manner.
+* **AdaBoost Classifier**: Short for Adaptive Boosting, a machine learning meta-algorithm that combines multiple weak classifiers to form a strong classifier, by focusing on errors made by previous classifiers and giving more weight to challenging cases.
+
+### Metrics
+* When working on a classification problem using scikit-learn (sklearn) in Python, it's important to evaluate the performance of your model using various metrics.
+* In this project we are using f1 score, precision, recall defined in `ClassificationMetricArtifact` class in `entity/artifact_entity.py` file
+* Here are some common metrics you might consider:
+
+1. **Accuracy**: Measures the proportion of correctly classified instances out of the total instances. Useful when classes are balanced.
+    ```python
+    from sklearn.metrics import accuracy_score
+    accuracy = accuracy_score(y_true, y_pred)
+    ```
+
+2. **Confusion Matrix**: Provides a summary of prediction results, including true positives, true negatives, false positives, and false negatives.
+    ```python
+    from sklearn.metrics import confusion_matrix
+    cm = confusion_matrix(y_true, y_pred)
+    ```
+
+3. **Precision**: Measures the proportion of positive predictions that are actually correct. Useful when the cost of false positives is high.
+    ```python
+    from sklearn.metrics import precision_score
+    precision = precision_score(y_true, y_pred, average='weighted')
+    ```
+
+4. **Recall (Sensitivity)**: Measures the proportion of actual positives that are correctly identified. Useful when the cost of false negatives is high.
+    ```python
+    from sklearn.metrics import recall_score
+    recall = recall_score(y_true, y_pred, average='weighted')
+    ```
+
+5. **F1 Score**: The harmonic mean of precision and recall. Useful when you need a balance between precision and recall.
+    ```python
+    from sklearn.metrics import f1_score
+    f1 = f1_score(y_true, y_pred, average='weighted')
+    ```
+
+6. **ROC AUC Score**: Measures the area under the receiver operating characteristic (ROC) curve. Useful for binary classification problems.
+    ```python
+    from sklearn.metrics import roc_auc_score
+    roc_auc = roc_auc_score(y_true, y_pred)
+    ```
+
+7. **Log Loss**: Measures the performance of a classification model where the prediction output is a probability value between 0 and 1.
+    ```python
+    from sklearn.metrics import log_loss
+    log_loss_value = log_loss(y_true, y_pred_proba)
+    ```
+
+* Each metric provides unique insights into different aspects of your model's performance. 
+* The choice of which metrics to use depends on the specific requirements and characteristics of the classification problem
+
 ## Coding Steps
 * Constants
 * Configuration
@@ -246,7 +310,7 @@ pip install --upgrade pymongo
     * feature_store_file_path
     * training_file_path
     * testing_file_path
-  * Using the above variables we create below file structure
+  * Using the above variables, we create below file structure
   ```plaintext
   artifacts/
   └── data_ingestion/
@@ -378,3 +442,27 @@ pip install --upgrade pymongo
   * The target column has unique values 1 and -1 this is converted to 1 and 0
 * **Step5**: Add **DataTransformation** class to `pipeline/data_transformation.py` file
 * **Step6**: Add the pipeline to the `main.py` file and run the pipeline
+
+### Model Trainer
+#### Steps
+* Get the data and pre-processor pickle from the `data transformation artifact` and train the model
+* This module contains 
+  * Model Trainer Config: Contains the model name and model file path and other details we use after training the model
+  * Model Trainer Component: Contains the model training code
+  * Model Trainer Artifact: Contains the model output details like a model pickle file path
+* Get the data using the model config
+* Load the data from the numpy arrays
+* Split the data into train and test data
+* Split into dependent and independent features
+* Train the model using the training data
+  * Multiple models can be trained and the best model can be selected using the model evaluation metrics and best score
+* Save the model using the pickle object by combining with the preprocessor pickle file
+
+#### Coding Steps
+* **Step1**: Add **MODEL TRAINER** constants to `constants/training_pipeline/__init__.py` file
+* **Step2**: Add **ModelTrainerConfig** class to `entity/config_entity.py` file
+  * In here we create `ModelTrainerConfig` class with as class variables for model and model file paths
+* **Step3**: Add **ModelTrainerArtifact** and **ClassificationMetricArtifact** class to `entity/artifact_entity.py`
+  * ClassificationMetricArtifact contains the classification metrics like accuracy, precision, recall, f1 score and confusion matrix
+* **Step4**: Add **ModelTrainer** class to `components/model_trainer.py` file
+  * In here we create `ModelTrainer` class
