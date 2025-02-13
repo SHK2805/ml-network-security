@@ -3,7 +3,6 @@ from typing import Any
 
 import pandas as pd
 import os
-from pandas import DataFrame
 
 from src.network_security.constants.training_pipeline import schema_file_path
 from src.network_security.entity.artifact_entity import DataIngestionArtifact, DataValidationArtifact
@@ -208,6 +207,7 @@ class DataValidation:
 
             logger.info(f"{tag}::Data validation for columns completed successfully")
 
+            # it there is no drift then the drift_status will be True else False
             drift_report, drift_status = self.generate_drift_report(train_data, test_data)
             self.save_report_to_yaml(drift_report, drift_status)
             logger.info(f"{tag}::Drift report saved successfully with status: {drift_status}")

@@ -9,6 +9,9 @@
 - [Database MongoDB](#database-mongodb)
 - [Coding Steps](#coding-steps)
 - [Coding Files](#coding-files)
+- [Data Ingestion](#data-ingestion)
+- [Data Validation](#data-validation)
+- [Data Transformation](#data-transformation)
 
 ## Setup Conda Environment
 To set up the Conda environment for this project, follow these steps:
@@ -261,6 +264,7 @@ pip install --upgrade pymongo
 * **Step8**: Add the pipeline to the `main.py` file and run the pipeline
 
 ### Data Validation
+* We get the data from the `data ingestion artifact` pipeline and validate the data
 #### Schema Validation
 * Schema validation allows you to define the structure of data columns and numerical columns in each collection.
 * Add `data_schema/schema.yaml` file with the below sections
@@ -269,17 +273,30 @@ pip install --upgrade pymongo
   * numerical_columns
     * Contains the numerical column names
 * We use this file to validate our data after data ingestion as part of the data validation process
-#### Other validations
-* Below are some of the various things we do to validate the data
-  * Schema Validation
-  * Data drift
+
+#### Data Drift
+* Data drift
     * Data drift refers to the changes in data distribution over time, which can affect the performance of machine learning models
     * When the data that a model was trained on no longer represents the real-world data it is currently exposed to, the model's predictions can become less accurate or even invalid.
     * There are two primary types of data drift:
       * **Covariate Shift**: The distribution of the input features changes over time.
       * **Concept Drift**: The relationship between the input features and the target variable changes over time.
+    * We check for drift in the data by comparing the data distribution of the training and testing data
+    * We calculate the drift for each column and if the drift is greater than the threshold then we consider it as drift
+    * We save the drift report in the `drift_report` folder
+    * The drift report contains the drift status for each column true or false, the p_value and the threshold
+    * If the drift is greater than the threshold then we consider it as drift
+    * The drift is calculated using the `ks_2samp` function from the `scipy` library
+    * The `ks_2samp` function returns the p_value and the statistic value
+    * If the p_value is less than the threshold then we consider it as drift
+
+#### Other validations
+* Below are some of the various things we do to validate the data
+  * Schema Validation
+  * Data drift
   * Number of columns
   * Check numerical columns
+
 #### Coding Steps
 * **Step1**: Add **schema file path** and  **DATA VALIDATION** constants to `constants/training_pipeline/__init__.py` file
 * **Step2**: Add **DataValidationConfig** class to `entity/config_entity.py` file
@@ -307,6 +324,18 @@ pip install --upgrade pymongo
       * i.e. The drift on all the columns should be less than the threshold and should be `False`
 * **Step5**: Add **DataValidation** class to `pipeline/data_validation.py` file
 * **Step6**: Add the pipeline to the `main.py` file and run the pipeline
-    
 
-
+### Data Transformation
+#### Steps
+* Get the `data validation artifact` and transform the data
+* Delete the `target` column from the train dataset 
+* Replace the `NaN` values in the train dataset using imputer techniques (Robust Scalar, Simple Imputer)
+  * Here we are using `KNNImputer` to replace the `NaN` values
+* Create the train data array
+* Create a preprocessing object pickle file for the model
+* Apply the preprocessing using the pickle file to the test dataset 
+* **[Optionally]** Use `SMOTETomek` on the train and test dataset to balance the data if needed 
+  * SMOTETomek is a technique used in machine learning to address class imbalance in datasets
+  * We are not using this as we already have balanced data
+* Save the transformed data in csv format
+* We use `fit_transform` on the train data and `transform` on the test data this avoids data leakage
