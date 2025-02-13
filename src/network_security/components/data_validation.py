@@ -126,8 +126,7 @@ class DataValidation:
                   is_numerical_columns_same_train and
                   is_numerical_columns_same_test)
 
-    def generate_drift_report(self, reference_data: pd.DataFrame, new_data: pd.DataFrame) -> tuple[
-        DataFrame | Any, bool]:
+    def generate_drift_report(self, reference_data: pd.DataFrame, new_data: pd.DataFrame) -> tuple[pd.DataFrame, bool]:
         """
         Generate a drift report comparing two datasets.
 
@@ -143,18 +142,21 @@ class DataValidation:
         threshold = 0.005
         drift_detected_overall = False
 
+        report_list = []
+
         for column in reference_data.columns:
             if column in new_data.columns:
                 stat, p_value = ks_2samp(reference_data[column], new_data[column])
                 drift_detected = p_value < threshold
                 drift_detected_overall = drift_detected_overall or drift_detected
-                report = report.append({
+                report_list.append({
                     'Feature': column,
                     'KS Statistic': stat,
                     'P-Value': p_value,
                     'Drift Detected': drift_detected
-                }, ignore_index=True)
+                })
 
+        report = pd.concat([report, pd.DataFrame(report_list)], ignore_index=True)
         status = not drift_detected_overall
         logger.info(f"{tag}::Drift report generated with status: {status}")
         return report, status
@@ -198,17 +200,17 @@ class DataValidation:
             test_data = DataValidation.read_data(test_file_path)
 
             # validate train and test data
-            status = self.validate_train_test_data(train_data, test_data)
-            if not status:
+            data_status = self.validate_train_test_data(train_data, test_data)
+            if not data_status:
                 logger.error(f"{tag}::Data validation failed.")
                 logger.error(f"{tag}::Data columns are not same as schema")
-                raise CustomException("Data validation failed", sys)
+                # raise CustomException("Data validation failed", sys)
 
-            logger.info(f"{tag}::Data validation completed successfully")
+            logger.info(f"{tag}::Data validation for columns completed successfully")
 
-            drift_report, status = self.generate_drift_report(train_data, test_data)
-            self.save_report_to_yaml(drift_report, status)
-            logger.info(f"{tag}::Drift report saved successfully")
+            drift_report, drift_status = self.generate_drift_report(train_data, test_data)
+            self.save_report_to_yaml(drift_report, drift_status)
+            logger.info(f"{tag}::Drift report saved successfully with status: {drift_status}")
 
             # save test and train data
             valid_data_dir = self.data_validation_config.valid_data_dir
@@ -220,6 +222,7 @@ class DataValidation:
             logger.info(f"{tag}::Validated data saved to csv successfully")
 
             # create data validation artifact
+            status = data_status and drift_status
             data_validation_artifact = DataValidationArtifact(
                 validation_status=status,
                 drift_report_file_path=self.data_validation_config.drift_report_file,

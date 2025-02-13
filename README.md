@@ -301,6 +301,10 @@ pip install --upgrade pymongo
 * **Step3**: Add **DataValidationArtifact** class to `entity/artifact_entity.py` file with paths to test and train data
 * **Step4**: Add **DataValidation** class to `components/data_validation.py` file
   * In here we create `DataValidation` class
+  * The validation is written in the function `initiate_data_validation`
+    * Both the schema and drift are validated and final status based on both values is saved in the `DataValidationArtifact` object `validation_status` attribute
+    * For drift if there is no drift then `True` is returned else `False`
+      * i.e. The drift on all the columns should be less than the threshold and should be `False`
 * **Step5**: Add **DataValidation** class to `pipeline/data_validation.py` file
 * **Step6**: Add the pipeline to the `main.py` file and run the pipeline
     

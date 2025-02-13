@@ -87,6 +87,7 @@ def create_project_structure(project_name: str) -> bool:
             # pipeline
             f"src/{project_name}/pipeline/__init__.py",
             f"src/{project_name}/pipeline/data_ingestion.py",
+            f"src/{project_name}/pipeline/data_validation.py",
             # main
             "main.py",
         ]

@@ -13,7 +13,7 @@ class DataIngestionTrainingPipeline:
         self.class_name = self.__class__.__name__
         self.stage_name = STAGE_NAME
 
-    def data_ingestion(self) -> None:
+    def data_ingestion(self) -> DataIngestionArtifact:
         tag: str = f"{self.class_name}::data_ingestion::"
         try:
             config: TrainingPipelineConfig = TrainingPipelineConfig()
@@ -30,6 +30,7 @@ class DataIngestionTrainingPipeline:
             data_ingestion_artifact: DataIngestionArtifact = data_ingestion.initiate_data_ingestion()
             logger.info(f"Data Ingestion Artifact: {data_ingestion_artifact}")
             logger.info(f"{tag}::Data ingestion completed successfully")
+            return data_ingestion_artifact
         except Exception as e:
             logger.error(f"{tag}::Error running the data ingestion pipeline: {e}")
             raise CustomException(e, sys)
