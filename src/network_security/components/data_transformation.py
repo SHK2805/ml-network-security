@@ -14,7 +14,7 @@ from src.network_security.logging.logger import logger
 from src.network_security.utils.main_utils.utils import save_numpy_array_data, save_object
 
 class DataTransformation:
-    def __init__(self, data_validation_artifact: DataValidationArtifact ,data_transformation_config: DataTransformationConfig):
+    def __init__(self, data_validation_artifact: DataValidationArtifact, data_transformation_config: DataTransformationConfig):
         try:
             self.class_name = self.__class__.__name__
             self.data_validation_artifact: DataValidationArtifact = data_validation_artifact
@@ -40,7 +40,14 @@ class DataTransformation:
         """
         logger.info(f"DataTransformation::get_data_transformer::Initiating data transformer")
         try:
-            KNNImputer(**data_transformation_imputer_params)
+            # the ** operator is used to unpack the dictionary of the hyperparameters
+            imputer:KNNImputer = KNNImputer(**data_transformation_imputer_params)
+            logger.info(f"DataTransformation::get_data_transformer:: Imputer initiated with hyperparameters: {data_transformation_imputer_params}")
+            processor: Pipeline = Pipeline([
+                ('imputer', imputer)
+            ])
+            return processor
+
         except Exception as e:
             logger.error(f"DataTransformation::get_data_transformer::Error in initiating data transformer: {e}")
             raise CustomException(e, sys) from e
@@ -66,7 +73,33 @@ class DataTransformation:
             # replace -1 with 0
             y_test = y_test.replace(-1, 0)
 
+            # get the data transformer
+            processor = DataTransformation.get_data_transformer(self)
+            # here we can give fit_transform on X_train but since we are using a pipeline we gave fit and transform separately
+            # we do not need to do this separately
+            processor_object = processor.fit(X_train)
+            # the transform object will be used to transform the train and test data
+            # this will return the data as an array
+            transformed_X_train = processor_object.transform(X_train)
+            transformed_X_test = processor_object.transform(X_test)
+
+            # combine the transformed independent features with the dependent features
+            transformed_train_data = np.c_[transformed_X_train, np.array(y_train)]
+            transformed_test_data = np.c_[transformed_X_test, np.array(y_test)]
+
+            # save the numpy array data
+            save_numpy_array_data(self.data_transformation_config.transformed_train_file_path, transformed_train_data)
+            save_numpy_array_data(self.data_transformation_config.transformed_test_file_path, transformed_test_data)
+            save_object(self.data_transformation_config.transformed_object_file_path, processor)
+
+            # preparing artifacts
+            artifact = DataTransformationArtifact(
+                transformed_object_file_path=self.data_transformation_config.transformed_object_file_path,
+                transformed_train_file_path=self.data_transformation_config.transformed_train_file_path,
+                transformed_test_file_path=self.data_transformation_config.transformed_test_file_path
+            )
             logger.info(f"{tag}::Data transformation complete")
+            return artifact
         except Exception as e:
             logger.error(f"{tag}::Error in data transformation: {e}")
             raise CustomException(e, sys)

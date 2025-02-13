@@ -1,8 +1,11 @@
 import sys
 from src.network_security.exception.exception import CustomException
 from src.network_security.logging.logger import logger
-from src.network_security.entity.artifact_entity import DataIngestionArtifact, DataValidationArtifact
+from src.network_security.entity.artifact_entity import (DataIngestionArtifact,
+                                                         DataValidationArtifact,
+                                                         DataTransformationArtifact)
 from src.network_security.pipeline.data_ingestion import DataIngestionTrainingPipeline
+from src.network_security.pipeline.data_transformation import DataTransformationTrainingPipeline
 from src.network_security.pipeline.data_validation import DataValidationTrainingPipeline
 
 
@@ -40,9 +43,25 @@ class RunPipeline:
             logger.error(f"{tag}::Error running the data validation pipeline: {e}")
             raise CustomException(e, sys)
 
+    def run_data_transformation_pipeline(self, data_validation_artifact: DataValidationArtifact) -> DataTransformationArtifact:
+        tag: str = f"{self.class_name}::run_data_transformation_pipeline::"
+        try:
+            data_transformation_pipeline: DataTransformationTrainingPipeline = DataTransformationTrainingPipeline(data_validation_artifact)
+            logger.info(f"[STARTED]>>>>>>>>>>>>>>>>>>>> {data_transformation_pipeline.stage_name} <<<<<<<<<<<<<<<<<<<<")
+            logger.info(f"{tag}::Running the data transformation pipeline")
+            data_transformation_artifact = data_transformation_pipeline.data_transformation()
+            logger.info(f"{tag}::Data transformation pipeline completed")
+            logger.info(
+                f"[COMPLETE]>>>>>>>>>>>>>>>>>>>> {data_transformation_pipeline.stage_name} <<<<<<<<<<<<<<<<<<<<\n\n\n")
+            return data_transformation_artifact
+        except Exception as e:
+            logger.error(f"{tag}::Error running the data transformation pipeline: {e}")
+            raise CustomException(e, sys)
+
     def run(self) -> None:
         data_ingestion_artifact: DataIngestionArtifact = self.run_data_ingestion_pipeline()
         data_validation_artifact: DataValidationArtifact = self.run_data_validation_pipeline(data_ingestion_artifact)
+        data_transformation_artifact: DataTransformationArtifact = self.run_data_transformation_pipeline(data_validation_artifact)
 
 if __name__ == "__main__":
     try:

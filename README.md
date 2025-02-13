@@ -376,3 +376,5 @@ pip install --upgrade pymongo
     * `load_object` to load the pickle object 
   * Extract the dependent and independent features from the train and test data
   * The target column has unique values 1 and -1 this is converted to 1 and 0
+* **Step5**: Add **DataTransformation** class to `pipeline/data_transformation.py` file
+* **Step6**: Add the pipeline to the `main.py` file and run the pipeline

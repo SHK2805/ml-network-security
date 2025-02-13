@@ -53,12 +53,17 @@ class DataValidationConfig:
 class DataTransformationConfig:
     def __init__(self, training_pipeline_config: TrainingPipelineConfig):
         self.class_name = self.__class__.__name__
-        self.data_transformation_dir = os.path.join(training_pipeline_config.artifact_dir, training_pipeline.data_transformation_dir_name)
-        self.transformed_data_dir = os.path.join(self.data_transformation_dir, training_pipeline.data_transformation_transformed_data_dir)
-        self.transformed_object_dir = os.path.join(self.data_transformation_dir, training_pipeline.data_transformation_transformed_object_dir)
-        self.train_file_path = os.path.join(self.transformed_data_dir, training_pipeline.data_transformation_train_file_path)
-        self.test_file_path = os.path.join(self.transformed_data_dir, training_pipeline.data_transformation_test_file_path)
-        self.imputer_params = training_pipeline.data_transformation_imputer_params
+        self.data_transformation_dir = os.path.join(training_pipeline_config.artifact_dir,
+                                                         training_pipeline.data_transformation_dir_name)
+        self.transformed_train_file_path = os.path.join(self.data_transformation_dir,
+                                                             training_pipeline.data_transformation_transformed_data_dir,
+                                                             training_pipeline.data_transformation_train_file_name)
+        self.transformed_test_file_path = os.path.join(self.data_transformation_dir,
+                                                            training_pipeline.data_transformation_transformed_data_dir,
+                                                            training_pipeline.data_transformation_test_file_name)
+        self.transformed_object_file_path = os.path.join(self.data_transformation_dir,
+                                                              training_pipeline.data_transformation_transformed_object_dir,
+                                                              training_pipeline.preprocessing_object_file_name)
         # folder structure
         # - artifacts
         #   - data_transformation
