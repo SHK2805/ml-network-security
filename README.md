@@ -13,6 +13,9 @@
 - [Data Validation](#data-validation)
 - [Data Transformation](#data-transformation)
 
+## Notes
+* If you have added `.github/workflows/main.yml` then disable the workflows in the GitHub repository settings till the correct code is added
+
 ## Setup Conda Environment
 To set up the Conda environment for this project, follow these steps:
 
@@ -322,6 +325,7 @@ pip install --upgrade pymongo
     * Both the schema and drift are validated and final status based on both values is saved in the `DataValidationArtifact` object `validation_status` attribute
     * For drift if there is no drift then `True` is returned else `False`
       * i.e. The drift on all the columns should be less than the threshold and should be `False`
+  * We use `read_yaml` and `write_yaml` from `utils.py` to read the schema and write drift report yaml files respectively
 * **Step5**: Add **DataValidation** class to `pipeline/data_validation.py` file
 * **Step6**: Add the pipeline to the `main.py` file and run the pipeline
 
@@ -331,6 +335,12 @@ pip install --upgrade pymongo
 * Delete the `target` column from the train dataset 
 * Replace the `NaN` values in the train dataset using imputer techniques (Robust Scalar, Simple Imputer)
   * Here we are using `KNNImputer` to replace the `NaN` values
+  * The K-Nearest Neighbors (KNN) Imputer is a technique used to fill in missing values in a dataset.
+  * KNN Imputer method helps to preserve the underlying patterns in the data and provides a more reliable way to handle missing values compared to simpler methods like mean or median imputation.
+  * Here's how it works:
+    * Identify Missing Values: The KNN imputer detects which entries in the dataset are missing. 
+    * Select Neighbors: For each missing value, it identifies the 'k' nearest data points (neighbors) based on the distance metric (like Euclidean distance) using the available data. 
+    * Impute Missing Values: The missing value is then imputed (filled in) by taking the average (or most frequent value, depending on the problem) of the neighboring data points.
 * Create the train data array
 * Create a preprocessing object pickle file for the model
 * Apply the preprocessing using the pickle file to the test dataset 
@@ -339,3 +349,30 @@ pip install --upgrade pymongo
   * We are not using this as we already have balanced data
 * Save the transformed data in csv format
 * We use `fit_transform` on the train data and `transform` on the test data this avoids data leakage
+* We create the below file structure
+  ```plaintext
+  artifacts/
+  ├── data_transformation/
+  │   ├── transformed/
+  │   │   ├── train.npy
+  │   │   └── test.npy
+  │   └── preprocessing/
+  │       └── preprocessing.pkl
+  ```
+* The `.npy` file is a binary file format used in Python for storing numpy arrays. 
+* The `Data Transformation Artifact` is returned at the end with the paths to the transformed data and preprocessing pickle object
+
+#### Coding Steps
+* **Step1**: Add **DATA TRANSFORMATION** constants to `constants/training_pipeline/__init__.py` file
+* **Step2**: Add **DataTransformationConfig** class to `entity/config_entity.py` file
+  * In here we create `DataTransformationConfig` class with as class variables for transformed and preprocessing folders
+* **Step3**: Add **DataTransformationArtifact** class to `entity/artifact_entity.py` file with paths to test and train data
+* **Step4**: Add **DataTransformation** class to `components/data_transformation.py` file
+  * In here we create `DataTransformation` class
+  * In the `utils` module we have the below functions to manage the numpy array and pickle object
+    * `save_numpy_array_data` to save the numpy array
+    * `load_numpy_array_data` to load the numpy array
+    * `save_object` to save the pickle object
+    * `load_object` to load the pickle object 
+  * Extract the dependent and independent features from the train and test data
+  * The target column has unique values 1 and -1 this is converted to 1 and 0

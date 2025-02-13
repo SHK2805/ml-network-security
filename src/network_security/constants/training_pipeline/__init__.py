@@ -1,5 +1,7 @@
 import os
 
+import numpy as np
+
 from src.network_security.constants import database_name, collection_name, data_file_name
 
 # COMMON CONSTANTS
@@ -26,3 +28,17 @@ data_validation_valid_dir: str = "validated"
 data_validation_invalid_dir: str = "invalid"
 data_validation_drift_report_dir: str = "drift_report"
 data_validation_drift_report_file_name: str = "drift_report.yaml"
+
+# DATA TRANSFORMATION CONSTANTS
+data_transformation_dir_name: str = "data_transformation"
+data_transformation_transformed_data_dir: str = "transformed"
+data_transformation_transformed_object_dir: str = "transformed_object"
+data_transformation_train_file_path = "train.npy"
+data_transformation_test_file_path = "test.npy"
+# this is to replace the missing values in the dataset
+# knn imputer is used to replace the missing values
+data_transformation_imputer_params: dict = {
+    "missing_values": np.nan,
+    "n_neighbors": 3,
+    "weights": "uniform",
+}
