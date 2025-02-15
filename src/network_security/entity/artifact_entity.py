@@ -21,17 +21,19 @@ class DataTransformationArtifact:
     transformed_test_file_path: str
 
 @dataclass
+class ClassificationMetricArtifact:
+    f1_score: float
+    precision_score: float
+    recall_score: float
+
+@dataclass
 class ModelResult:
     best_model: object
     best_params: dict
     train_accuracy: float
     test_accuracy: float
-
-@dataclass
-class ClassificationMetricArtifact:
-    f1_score: float
-    precision_score: float
-    recall_score: float
+    train_metrics: ClassificationMetricArtifact
+    test_metrics: ClassificationMetricArtifact
 
 @dataclass
 class ModelTrainerArtifact:

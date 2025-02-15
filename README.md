@@ -466,3 +466,4 @@ pip install --upgrade pymongo
   * ClassificationMetricArtifact contains the classification metrics like accuracy, precision, recall, f1 score and confusion matrix
 * **Step4**: Add **ModelTrainer** class to `components/model_trainer.py` file
   * In here we create `ModelTrainer` class
+* **Step5**: Add **ModelTrainer** class to `pipeline/model_trainer.py` file
