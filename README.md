@@ -25,14 +25,20 @@ To set up the Conda environment for this project, follow these steps:
 
 1. **Create the Conda environment**:
     ```bash
-    conda create --name nss python=3.10
+    # list all the Conda environments
+    conda env list
+    # create a new Conda environment
+    conda create --name <name> python=3.10
+    # if you want to create the conda environment in a specific location
+    conda create --prefix </path/to/conda>/env <name> python=3.10
     ```
 
 2. **Activate the Conda environment**:
     ```bash
-    conda activate nss
+    conda activate <name>
+    # activate the conda environment in a specific location
+    conda activate </path/to/conda>/env
     ```
-
 3. **Install the required packages**:
     ```bash
     pip install -r requirements.txt
@@ -41,7 +47,34 @@ To set up the Conda environment for this project, follow these steps:
 4. **Deactivate the Conda environment**:
     ```bash
     conda deactivate
+   # deactivate the conda environment in a specific location
+    conda deactivate </path/to/conda>/env
     ```
+5. **Delete the Conda environment**:
+    ```bash
+    # list all the conda environments
+    conda env list 
+    # delete the conda environment
+    conda remove --name <name> --all
+    # delete the conda environment in a specific location
+    conda remove --prefix </path/to/conda>/env --all
+    ```
+6. **Clean the Conda environment**:
+    ```bash
+   # use this carefully as it will remove all the packages from the environment
+    conda clean --all
+    ```
+7. **My Conda environment**:
+    ```bash
+    conda env list
+    conda create --name ml python=3.10
+    conda activate ml
+    pip install -r requirements.txt
+    conda deactivate
+    conda remove --name ml --all
+    conda clean --all
+    ```
+    
 
 ## Using Git
 To manage the repository using Git, follow these steps:
@@ -242,42 +275,56 @@ pip install --upgrade pymongo
 
 1. **Accuracy**: Measures the proportion of correctly classified instances out of the total instances. Useful when classes are balanced.
     ```python
+    y_true = [0, 1, 1, 0, 1]
+    y_pred = [0, 1, 0, 0, 1]
     from sklearn.metrics import accuracy_score
     accuracy = accuracy_score(y_true, y_pred)
     ```
 
 2. **Confusion Matrix**: Provides a summary of prediction results, including true positives, true negatives, false positives, and false negatives.
     ```python
+    y_true = [0, 1, 1, 0, 1]
+    y_pred = [0, 1, 0, 0, 1]
     from sklearn.metrics import confusion_matrix
     cm = confusion_matrix(y_true, y_pred)
     ```
 
 3. **Precision**: Measures the proportion of positive predictions that are actually correct. Useful when the cost of false positives is high.
     ```python
+    y_true = [0, 1, 1, 0, 1]
+    y_pred = [0, 1, 0, 0, 1]
     from sklearn.metrics import precision_score
     precision = precision_score(y_true, y_pred, average='weighted')
     ```
 
 4. **Recall (Sensitivity)**: Measures the proportion of actual positives that are correctly identified. Useful when the cost of false negatives is high.
     ```python
+    y_true = [0, 1, 1, 0, 1]
+    y_pred = [0, 1, 0, 0, 1]
     from sklearn.metrics import recall_score
     recall = recall_score(y_true, y_pred, average='weighted')
     ```
 
 5. **F1 Score**: The harmonic mean of precision and recall. Useful when you need a balance between precision and recall.
     ```python
+    y_true = [0, 1, 1, 0, 1]
+    y_pred = [0, 1, 0, 0, 1]
     from sklearn.metrics import f1_score
     f1 = f1_score(y_true, y_pred, average='weighted')
     ```
 
 6. **ROC AUC Score**: Measures the area under the receiver operating characteristic (ROC) curve. Useful for binary classification problems.
     ```python
+    y_true = [0, 1, 1, 0, 1]
+    y_pred = [0, 1, 0, 0, 1]
     from sklearn.metrics import roc_auc_score
     roc_auc = roc_auc_score(y_true, y_pred)
     ```
 
 7. **Log Loss**: Measures the performance of a classification model where the prediction output is a probability value between 0 and 1.
     ```python
+    y_true = [0, 1, 1, 0, 1]
+    y_pred_proba = [0, 1, 0, 0, 1]
     from sklearn.metrics import log_loss
     log_loss_value = log_loss(y_true, y_pred_proba)
     ```

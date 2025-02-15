@@ -33,7 +33,7 @@ class ModelTrainer:
     def train_and_evaluate_models(self, x_train, y_train, x_test, y_test):
         tag: str = f"{self.class_name}::train_model"
         try:
-            logger.info(f"{tag} - Training model")
+            logger.info(f"{tag}::Training model")
 
             # Load models and hyperparameters from YAML file
             models_config = read_yaml(model_params_file_path)
@@ -101,7 +101,7 @@ class ModelTrainer:
 
             model_dir_path = os.path.dirname(self.model_trainer_config.trained_model_file_path)
             if not os.path.exists(model_dir_path):
-                logger.info(f"{tag} - Creating model directory")
+                logger.info(f"{tag}::Creating model directory")
                 os.makedirs(model_dir_path, exist_ok=True)
 
             network_security_model: NetworkSecurityModel =  NetworkSecurityModel(preprocessor=preprocessing_object, model=best_model)
@@ -109,8 +109,8 @@ class ModelTrainer:
 
             # check if the model is saved
             if not os.path.exists(self.model_trainer_config.trained_model_file_path):
-                logger.error(f"{tag} - Model not saved")
-                raise CustomException(f"{tag} - Model not saved", sys)
+                logger.error(f"{tag}::Model not saved")
+                raise CustomException(f"{tag}::Model not saved", sys)
 
             # model trainer artifact
             model_trainer_artifact: ModelTrainerArtifact = ModelTrainerArtifact(
@@ -119,19 +119,19 @@ class ModelTrainer:
                 test_metric_artifact=test_classification_metrics
             )
 
-            logger.info(f"{tag} - Model trainer artifact: {model_trainer_artifact}")
-            logger.info(f"{tag} - Model training complete")
+            logger.info(f"{tag}::Model trainer artifact: {model_trainer_artifact}")
+            logger.info(f"{tag}::Model training complete")
 
             return model_trainer_artifact
 
         except Exception as e:
-            logger.error(f"{tag} - Error in training model: {str(e)}")
+            logger.error(f"{tag}::Error in training model: {str(e)}")
             raise CustomException(e, sys)
 
     def initiate_model_trainer(self) -> ModelTrainerArtifact:
         tag: str = f"{self.class_name}::initiate_model_trainer"
         try:
-            logger.info(f"{tag} - Initiating model training")
+            logger.info(f"{tag}::Initiating model training")
             train_df = load_numpy_array_data(self.data_transformation_artifact.transformed_train_file_path)
             test_df = load_numpy_array_data(self.data_transformation_artifact.transformed_test_file_path)
 
@@ -142,8 +142,8 @@ class ModelTrainer:
 
             # train the model
             model_trainer_artifact = self.train_and_evaluate_models(x_train, y_train, x_test, y_test)
-            logger.info(f"{tag} - Complete model training")
+            logger.info(f"{tag}::Complete model training")
             return model_trainer_artifact
         except Exception as e:
-            logger.error(f"{tag} - Error in loading data: {str(e)}")
+            logger.error(f"{tag}::Error in loading data: {str(e)}")
             raise CustomException(e, sys)
