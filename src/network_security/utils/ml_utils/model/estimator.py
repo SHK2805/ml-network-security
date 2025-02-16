@@ -6,14 +6,18 @@ from src.network_security.exception.exception import CustomException
 from src.network_security.logging.logger import logger
 
 class NetworkSecurityModel:
-    def __init__(self, preprocessor, model):
+    def __init__(self, preprocessor, model, model_name):
         try:
             self.class_name = self.__class__.__name__
             self.preprocessor = preprocessor
             self.model = model
+            self.model_name = model_name
         except Exception as e:
             logger.error(f"Error in initializing NetworkSecurityModel: {str(e)}")
             raise CustomException(e, sys)
+
+    def get_model_name(self):
+        return self.model_name
 
     def predict(self, x):
         try:

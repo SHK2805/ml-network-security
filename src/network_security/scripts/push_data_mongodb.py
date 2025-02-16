@@ -107,8 +107,8 @@ def main():
         file_path = os.path.join(Path(__file__).parent.parent.parent.parent, Path(data_file_folder_name, data_file_name))
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"{tag}::File not found: {file_path}")
-        database_name = "phishing_data"
-        collection_name = "phishing_data"
+        # database_name = "phishing_data"
+        # collection_name = "phishing_data"
 
         obj = NetworkDataExtract()
         count = obj.process(file_path)

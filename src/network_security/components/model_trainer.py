@@ -44,6 +44,7 @@ class ModelTrainer:
             # Train each model with GridSearchCV for hyperparameter tuning and evaluate their performance
             skf = StratifiedKFold(n_splits=5)
             for name, model_info in models_config['models'].items():
+                logger.info(f'********** Training for: {name} started **********')
                 model_class = eval(model_info['model'])
                 model = model_class()
                 grid_search = GridSearchCV(model, model_info['params'], cv=skf, scoring='f1')
@@ -73,9 +74,11 @@ class ModelTrainer:
                     test_metrics=test_metrics
                 )
 
+
                 logger.info(f'{name} Best Parameters: {grid_search.best_params_}')
                 logger.info(f'{name} Train Accuracy: {train_accuracy:.2f}')
                 logger.info(f'{name} Test Accuracy: {test_accuracy:.2f}')
+                logger.info(f'********** Training for: {name} complete **********')
 
             # Find the best model based on multiple metrics (e.g., test accuracy)
             best_model_name = max(results, key=lambda k: results[k].test_accuracy)
@@ -104,7 +107,9 @@ class ModelTrainer:
                 logger.info(f"{tag}::Creating model directory")
                 os.makedirs(model_dir_path, exist_ok=True)
 
-            network_security_model: NetworkSecurityModel =  NetworkSecurityModel(preprocessor=preprocessing_object, model=best_model)
+            network_security_model: NetworkSecurityModel =  NetworkSecurityModel(preprocessor=preprocessing_object,
+                                                                                 model=best_model,
+                                                                                 model_name=best_model_name)
             save_object(self.model_trainer_config.trained_model_file_path, network_security_model)
 
             # check if the model is saved
