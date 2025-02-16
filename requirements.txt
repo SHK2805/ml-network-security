@@ -12,4 +12,5 @@ setuptools
 pyyaml
 pathlib
 dill
+mlflow
 # -e .

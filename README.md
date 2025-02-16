@@ -332,6 +332,22 @@ pip install --upgrade pymongo
 * Each metric provides unique insights into different aspects of your model's performance. 
 * The choice of which metrics to use depends on the specific requirements and characteristics of the classification problem
 
+## MLFlow
+* Before running the model evaluation pipeline or the model prediction pipeline, make sure the **mlflow server is running**
+* Make sure the correct **mlflow uri** is set in the config file **config.yaml**
+* Add **mlflow** package to the **requirements.txt** file or install it manually using `pip install mlflow`
+  * The other packages needed are given in the **requirements.txt** file
+* Make sure the mlflow server port does not conflict with any other port on your machine
+* Make sure the mlflow server port does not conflict with Flask server port on your machine
+* Run the mlflow server using the following command
+* Open the terminal and run the following command
+```bash
+# mlflow server will be running on localhost: 127.0.0.1 and on port: 8080
+mlflow server --host 127.0.0.1 --port 8080
+```
+* Access the mlflow server at http://127.0.0.1:8080/ 
+* Run the MLFlow and Flask in two different terminals
+
 ## Coding Steps
 * Constants
 * Configuration
@@ -513,4 +529,5 @@ pip install --upgrade pymongo
   * ClassificationMetricArtifact contains the classification metrics like accuracy, precision, recall, f1 score and confusion matrix
 * **Step4**: Add **ModelTrainer** class to `components/model_trainer.py` file
   * In here we create `ModelTrainer` class
+  * Add `track_mlflow` function to track the model metrics using MLFlow
 * **Step5**: Add **ModelTrainer** class to `pipeline/model_trainer.py` file
