@@ -75,7 +75,8 @@ class DataTransformation:
 
             # get the data transformer
             processor = DataTransformation.get_data_transformer(self)
-            # here we can give fit_transform on X_train but since we are using a pipeline we gave fit and transform separately
+            # here we can give fit_transform on X_train,
+            # but since we are using a pipeline we gave fit and transform separately,
             # we do not need to do this separately
             processor_object = processor.fit(X_train)
             # the transform object will be used to transform the train and test data
@@ -91,6 +92,13 @@ class DataTransformation:
             save_numpy_array_data(self.data_transformation_config.transformed_train_file_path, transformed_train_data)
             save_numpy_array_data(self.data_transformation_config.transformed_test_file_path, transformed_test_data)
             save_object(self.data_transformation_config.transformed_object_file_path, processor)
+            # save the preprocessing object in final_models folder
+            # create the folder if it does not exist
+            if not os.path.exists(self.data_transformation_config.transformed_final_preprocessing_object_dir):
+                logger.info(f"{tag}::Creating final preprocessing object directory at: "
+                            f"{self.data_transformation_config.transformed_final_preprocessing_object_dir}")
+                os.makedirs(self.data_transformation_config.transformed_final_preprocessing_object_dir)
+            save_object(self.data_transformation_config.final_transformed_reprocessing_object_file_path, processor)
 
             # preparing artifacts
             artifact = DataTransformationArtifact(

@@ -348,6 +348,33 @@ mlflow server --host 127.0.0.1 --port 8080
 * Access the mlflow server at http://127.0.0.1:8080/ 
 * Run the MLFlow and Flask in two different terminals
 
+## Project steps
+* The project is divided into multiple steps
+* Load the data into the mongodb database [optional as this usually is done by the data engineering team]
+* Data Ingestion
+  * Read the data from the mongodb database and save them into csv files
+* Data Validation
+  * Validate the data after data ingestion
+  * Check for schema validation and data drift
+* Data Transformation
+  * Transform the data after data validation
+  * Replace the *NaN* values in the data
+  * Create the train and test data arrays
+  * Apply the preprocessing object to the test data
+  * Save the transformed data in the numpy array format
+  * Save the preprocessing object in the pickle format
+    * The preprocessing object is saved in 
+      * `artifacts/data_transformation/transformed_object` 
+      * `artifacts/final_models`
+  * Balance the data using SMOTETomek [optional]
+* Model Trainer
+  * Train the model using the transformed data
+  * Read the model and hyperparameters from the config file `model_params/model_params.yaml`
+  * Track the model metrics using MLFlow
+  * Save the model in the pickle format
+  * Save the model in the `artifacts/model_trainer/trained_model` folder
+  * Save the model in the `artifacts/final_models` folder
+
 ## Coding Steps
 * Constants
 * Configuration
@@ -483,7 +510,7 @@ mlflow server --host 127.0.0.1 --port 8080
   │   ├── transformed/
   │   │   ├── train.npy
   │   │   └── test.npy
-  │   └── preprocessing/
+  │   └── transformed_object/
   │       └── preprocessing.pkl
   ```
 * The `.npy` file is a binary file format used in Python for storing numpy arrays. 
@@ -520,6 +547,18 @@ mlflow server --host 127.0.0.1 --port 8080
 * Train the model using the training data
   * Multiple models can be trained and the best model can be selected using the model evaluation metrics and best score
 * Save the model using the pickle object by combining with the preprocessor pickle file
+* We create the below file structure
+  ```plaintext
+    artifacts/
+    └── model_trainer/
+        ├── trained_model/
+        │   └── model.pkl
+        ├── final_models/
+        │   └── model.pkl
+        │   └── preprocessing.pkl
+        └── saved_models/
+            └── model.pkl
+  ```
 
 #### Coding Steps
 * **Step1**: Add **MODEL TRAINER** constants to `constants/training_pipeline/__init__.py` file
@@ -530,4 +569,5 @@ mlflow server --host 127.0.0.1 --port 8080
 * **Step4**: Add **ModelTrainer** class to `components/model_trainer.py` file
   * In here we create `ModelTrainer` class
   * Add `track_mlflow` function to track the model metrics using MLFlow
+  * The final best model is saved in the `artifacts/final_models` folder
 * **Step5**: Add **ModelTrainer** class to `pipeline/model_trainer.py` file

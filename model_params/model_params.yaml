@@ -4,16 +4,3 @@ models:
     params:
       C: [0.01, 0.05, 0.1, 1, 10, 100]
       solver: ['newton-cg', 'lbfgs', 'liblinear']
-  Decision Tree:
-    model: DecisionTreeClassifier
-    params:
-      criterion: ['gini', 'entropy', 'log_loss']
-      splitter: ['best', 'random']
-      max_features: ['sqrt', 'log2']
-      max_depth: [10, 20, 30, 40, 50]
-  KNN:
-    model: KNeighborsClassifier
-    params:
-      n_neighbors: [3, 5, 7, 9]
-      weights: ['uniform', 'distance']
-      algorithm: ['auto', 'ball_tree', 'kd_tree', 'brute']

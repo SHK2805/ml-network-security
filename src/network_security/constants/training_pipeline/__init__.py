@@ -37,6 +37,8 @@ data_transformation_transformed_object_dir: str = "transformed_object"
 data_transformation_train_file_name = "train_data.npy"
 data_transformation_test_file_name = "test_data.npy"
 preprocessing_object_file_name = "preprocessing.pkl"
+data_transformation_final_preprocessing_object_dir : str = "final_models"
+data_transformation_final_preprocessing_object_file_name : str = "preprocessing.pkl"
 # this is to replace the missing values in the dataset
 # knn imputer is used to replace the missing values
 data_transformation_imputer_params: dict = {
@@ -50,5 +52,7 @@ model_trainer_dir_name: str = "model_trainer"
 model_trainer_trained_model_dir: str = "trained_model"
 model_trainer_saved_model_dir: str = "saved_models"
 model_trainer_trained_model_file_name: str = "model.pkl"
+model_trainer_final_model_dir: str = "final_models"
+model_trainer_final_model_file_name: str = "model.pkl"
 model_trainer_expected_score: float = 0.6
 model_trainer_over_fitting_under_fitting_threshold: float = 0.05

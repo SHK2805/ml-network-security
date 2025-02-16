@@ -64,6 +64,10 @@ class DataTransformationConfig:
         self.transformed_object_file_path = os.path.join(self.data_transformation_dir,
                                                               training_pipeline.data_transformation_transformed_object_dir,
                                                               training_pipeline.preprocessing_object_file_name)
+        self.transformed_final_preprocessing_object_dir = os.path.join(training_pipeline_config.artifact_dir,
+                                            training_pipeline.data_transformation_final_preprocessing_object_dir)
+        self.final_transformed_reprocessing_object_file_path = os.path.join(self.transformed_final_preprocessing_object_dir,
+                                                  training_pipeline.data_transformation_final_preprocessing_object_file_name)
         # folder structure
         # - artifacts
         #   - data_transformation
@@ -79,8 +83,24 @@ class ModelTrainerConfig:
         self.model_trainer_dir = os.path.join(training_pipeline_config.artifact_dir, training_pipeline.model_trainer_dir_name)
         self.trained_model_file_path = os.path.join(self.model_trainer_dir, training_pipeline.model_trainer_trained_model_dir,
                                                         training_pipeline.model_trainer_trained_model_file_name)
+        self.final_model_dir = os.path.join(training_pipeline_config.artifact_dir,
+                                            training_pipeline.model_trainer_final_model_dir)
+        self.final_model_file_path = os.path.join(self.final_model_dir,
+                                                    training_pipeline.model_trainer_final_model_file_name)
+
         self.expected_accuracy = training_pipeline.model_trainer_expected_score
         self.overfitting_underfitting_threshold = training_pipeline.model_trainer_over_fitting_under_fitting_threshold
+
+        # folder structure
+        # - artifacts
+        #   - model_trainer
+        #       - trained_model
+        #           - model.pkl
+        #       - final_models
+        #           - model.pkl
+        #           - preprocessing.pkl
+        #       - saved_models
+        #           - model.pkl
 
 
 

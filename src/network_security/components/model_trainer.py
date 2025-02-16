@@ -239,7 +239,18 @@ class ModelTrainer:
             network_security_model: NetworkSecurityModel =  NetworkSecurityModel(preprocessor=preprocessing_object,
                                                                                  model=best_model,
                                                                                  model_name=best_model_name)
+
+            # serialize and save the model object to a file,
+            # so it can be later reloaded and used without having to recreate it from scratch
             save_object(self.model_trainer_config.trained_model_file_path, network_security_model)
+
+            # save the final model to a file
+            # create the final model directory if it does not exist
+            final_model_dir_path = self.model_trainer_config.final_model_dir
+            if not os.path.exists(final_model_dir_path):
+                logger.info(f"{tag}::Creating final model directory")
+                os.makedirs(final_model_dir_path, exist_ok=True)
+            save_object(self.model_trainer_config.final_model_file_path, best_model)
 
             # check if the model is saved
             if not os.path.exists(self.model_trainer_config.trained_model_file_path):
