@@ -13,4 +13,6 @@ pyyaml
 pathlib
 dill
 mlflow
+fastapi
+uvicorn
 # -e .

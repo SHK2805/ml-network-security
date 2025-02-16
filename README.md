@@ -10,12 +10,19 @@
 - [Database MongoDB](#database-mongodb)
 - [Classifiers](#classifiers)
 - [Metrics](#metrics)
+- [MLFlow](#mlflow)
+- [Project steps](#project-steps)
 - [Coding Steps](#coding-steps)
 - [Coding Files](#coding-files)
 - [Data Ingestion](#data-ingestion)
 - [Data Validation](#data-validation)
 - [Data Transformation](#data-transformation)
 - [Model Trainer](#model-trainer)
+
+
+## TODO
+* Push the preprocessor and model pickle files to S3 buckets instead of saving into the final_models folder
+
 
 ## Notes
 * If you have added `.github/workflows/main.yml` then disable the workflows in the GitHub repository settings till the correct code is added
@@ -348,6 +355,28 @@ mlflow server --host 127.0.0.1 --port 8080
 * Access the mlflow server at http://127.0.0.1:8080/ 
 * Run the MLFlow and Flask in two different terminals
 
+## Flask
+* Before running the Flask API make sure the **Flask server is running**, to run the flask server follow the below steps
+* Make sure the correct **Flask server host ip** and  **Flask server port** is set in the app.py file
+* Make sure the Flask server port does not conflict with any other port on your machine like MLFLow server port
+```python
+# Flask server will be running on localhost:127.0.0.1  and on port: 5000
+from flask import Flask
+app = Flask(__name__) 
+app.run(host="0.0.0.0", port=8000)
+```
+* Open the terminal and run the following command
+```bash
+# python app.py
+uvicorn app:app --reload
+```
+* Access the flask app at http://127.0.0.1:8000
+* Access the flask app page using http://127.0.0.1:8000/docs
+* To run the training pipeline through the flask app:
+  * Click `/train` Train Route endpoint
+  * Click `Try it out`
+  * Click `Execute`
+
 ## Project steps
 * The project is divided into multiple steps
 * Load the data into the mongodb database [optional as this usually is done by the data engineering team]
@@ -571,3 +600,27 @@ mlflow server --host 127.0.0.1 --port 8080
   * Add `track_mlflow` function to track the model metrics using MLFlow
   * The final best model is saved in the `artifacts/final_models` folder
 * **Step5**: Add **ModelTrainer** class to `pipeline/model_trainer.py` file
+
+## Pipelines
+#### Main.py
+* The project is divided into multiple pipelines
+* Each pipeline is a separate module
+  * **Data Ingestion**: pipeline/data_ingestion.py
+  * **Data Validation**: pipeline/data_validation.py
+  * **Data Transformation**: pipeline/data_transformation.py
+  * **Model Trainer**: pipeline/model_trainer.py
+* The pipelines are run in the `main.py` file
+
+#### Training Pipeline
+* Another way we achieved the same effect is using the `training_pipeline.py`
+  * All the above pipelines are run in the `training_pipeline.py` file as a single class
+* The `TrainingPipeline` class is defined in the `pipeline/training_pipeline.py` file
+
+## App
+* The app is a Flask application that serves the model
+* The app is defined in the `app.py` file
+* We can either use the **training_pipeline.py** or the **main.py** to run the project in `app.py`
+* This uses the FastAPI library to serve the model
+  * /docs: Swagger UI for the API
+  * /train: Train the model
+  * 
