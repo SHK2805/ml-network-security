@@ -50,6 +50,8 @@ def create_project_structure(project_name: str) -> bool:
             f"src/{project_name}/__init__.py",
             # cloud
             f"src/{project_name}/cloud/__init__.py",
+            f"src/{project_name}/cloud/deploy.py",
+            f"src/{project_name}/cloud/s3_create.yaml",
             # logging
             f"src/{project_name}/logging/__init__.py",
             f"src/{project_name}/logging/logger.py",
@@ -83,6 +85,7 @@ def create_project_structure(project_name: str) -> bool:
             # constants
             f"src/{project_name}/constants/__init__.py",
             f"src/{project_name}/constants/training_pipeline/__init__.py",
+            f"src/{project_name}/constants/cloud_pipeline/__init__.py",
             # config
             f"src/{project_name}/config/__init__.py",
             f"src/{project_name}/config/configuration.py",

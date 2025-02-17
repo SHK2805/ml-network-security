@@ -21,6 +21,7 @@
 - [Model Trainer](#model-trainer)
 - [Pipelines](#pipelines)
 - [App](#app)
+- [Cloud Deployment](#cloud-deployment)
 
 
 ## TODO
@@ -37,6 +38,7 @@
 * Place the data in the `phishingdata` directory
 * Create the mongodb database and collection
 * Load the data into the mongodb database using the `push_data_mongodb.py` file
+* Create the cloud stack using the `deploy.py` file
 * Run the `main.py` file to run the training pipeline
 * Run the `make_predictions.py` file to run the prediction pipeline
 * Run the `clean.py` file to clean the generated files and folders
@@ -680,3 +682,43 @@ uvicorn app:app --reload
 # python app.py
 uvicorn app:app --reload
 ```
+
+## Cloud Deployment
+### Configure
+* Before deploying to the cloud, make sure the `awscli` is installed
+  * The `awscli` is a command-line tool that provides commands for interacting with AWS services
+  * To install the `awscli` package, run the following command:
+  ```bash
+  pip install awscli
+  ```
+  * To configure the `awscli`, run the following command:
+  * Open the terminal and run the following command
+  ```bash
+  aws configure
+  ```
+    * Enter the following details:
+        * AWS Access Key ID
+        * AWS Secret Access Key
+        * Default region name
+        * Default output format
+* Before deploying to the cloud, make sure the `boto3` and `botocore` packages are installed
+* Add `boto3` and `botocore` to the `requirements.txt` file
+  * The `boto3` is the AWS SDK for Python
+  * The `botocore` is the low-level, core functionality of the AWS SDK for Python
+* To install the `boto3` and `botocore` packages manually, run the following command:
+```bash
+pip install boto3 botocore
+```
+### S3 Bucket
+* Once the models are trained and the app is ready, we can deploy them to **s3 bucket** in AWS
+* We can use the `boto3` library to upload the files to the s3 bucket
+  * We use this to create the stack using the `cloudformation` template
+  * The cloudformation template and the python code for the stack creation is in the `network_security/cloud` folder
+    * **s3_create.yaml** file is the cloudformation template
+    * **deploy.py** a file is the python code to create the stack
+* We can use the `awscli` to upload the files to the s3 bucket
+  * We are using this method to upload to the s3 bucket
+* The **preprocessor** and **model** pickle files are uploaded to the s3 bucket from the `final_models` folder
+  *  The entire `final_models` folder is synced to the s3 bucket
+* The `artifacts` folder is uploaded to the s3 bucket
+  * The entire `artifacts` folder is synced to the s3 bucket
