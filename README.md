@@ -2,6 +2,7 @@
 
 ## Table of Contents
 - [Notes](#notes)
+- [Simple Steps](#simple-steps)
 - [Setup Conda Environment](#setup-conda-environment)
 - [Using Git](#using-git)
 - [Data](#data)
@@ -18,6 +19,8 @@
 - [Data Validation](#data-validation)
 - [Data Transformation](#data-transformation)
 - [Model Trainer](#model-trainer)
+- [Pipelines](#pipelines)
+- [App](#app)
 
 
 ## TODO
@@ -26,6 +29,17 @@
 
 ## Notes
 * If you have added `.github/workflows/main.yml` then disable the workflows in the GitHub repository settings till the correct code is added
+
+## Simple Steps
+* Create a new conda environment
+* Activate the conda environment
+* Install the required packages using the `requirements.txt` file
+* Place the data in the `phishingdata` directory
+* Create the mongodb database and collection
+* Load the data into the mongodb database using the `push_data_mongodb.py` file
+* Run the `main.py` file to run the training pipeline
+* Run the `make_predictions.py` file to run the prediction pipeline
+* Run the `clean.py` file to clean the generated files and folders
 
 ## Setup Conda Environment
 To set up the Conda environment for this project, follow these steps:
@@ -139,6 +153,7 @@ To manage the repository using Git, follow these steps:
 ## Data
 * The data is stored in the `phishingdata` directory.
 * The data is stored in the CSV format in the `phishingdata.csv` file.
+* Test data is stored in the `phishingdata/testData.csv` file.
 
 ## Environment File
 * Create a new environment file (`.env`) in the root directory.
@@ -365,6 +380,7 @@ from flask import Flask
 app = Flask(__name__) 
 app.run(host="0.0.0.0", port=8000)
 ```
+* To run the app, activate conda environment and run the below command
 * Open the terminal and run the following command
 ```bash
 # python app.py
@@ -372,10 +388,6 @@ uvicorn app:app --reload
 ```
 * Access the flask app at http://127.0.0.1:8000
 * Access the flask app page using http://127.0.0.1:8000/docs
-* To run the training pipeline through the flask app:
-  * Click `/train` Train Route endpoint
-  * Click `Try it out`
-  * Click `Execute`
 
 ## Project steps
 * The project is divided into multiple steps
@@ -468,13 +480,13 @@ uvicorn app:app --reload
       * **Covariate Shift**: The distribution of the input features changes over time.
       * **Concept Drift**: The relationship between the input features and the target variable changes over time.
     * We check for drift in the data by comparing the data distribution of the training and testing data
-    * We calculate the drift for each column and if the drift is greater than the threshold then we consider it as drift
+    * We calculate the drift for each column and if the drift is greater than the threshold, then we consider it as drift
     * We save the drift report in the `drift_report` folder
     * The drift report contains the drift status for each column true or false, the p_value and the threshold
-    * If the drift is greater than the threshold then we consider it as drift
+    * If the drift is greater than the threshold, then we consider it as a drift
     * The drift is calculated using the `ks_2samp` function from the `scipy` library
     * The `ks_2samp` function returns the p_value and the statistic value
-    * If the p_value is less than the threshold then we consider it as drift
+    * If the p_value is less than the threshold, then we consider it as drift
 
 #### Other validations
 * Below are some of the various things we do to validate the data
@@ -487,7 +499,7 @@ uvicorn app:app --reload
 * **Step1**: Add **schema file path** and  **DATA VALIDATION** constants to `constants/training_pipeline/__init__.py` file
 * **Step2**: Add **DataValidationConfig** class to `entity/config_entity.py` file
   * In here we create `DataValidationConfig` class with as class variables for valid, invalid and drift report folders
-  * Using the above variables we create below file structure
+  * Using the above variables, we create below file structure
   ```plaintext
     artifacts/
     ├── data_validation/
@@ -616,11 +628,55 @@ uvicorn app:app --reload
   * All the above pipelines are run in the `training_pipeline.py` file as a single class
 * The `TrainingPipeline` class is defined in the `pipeline/training_pipeline.py` file
 
+#### Prediction Pipeline
+* The data is predicted using the saved model and preprocessor pickle files
+* The data is uploaded in CSV format
+* The predictions are displayed in the `templates/table.html` file
+* The predictions are saved in the `predictions` folder in CSV format
+* The predictions are also saved in the MongoDB database
+* Coding steps
+  * **Step1**: Add **PREDICTION** constants to `constants/training_pipeline/__init__.py` file
+  * **Step2**: Add **PredictionConfig** class to `entity/config_entity.py` file
+  * **Step3**: [Optional] Add **PredictionArtifact** class to `entity/artifact_entity.py` file with paths to test and train data
+    * We did not implement this 
+  * **Step4**: Add **Prediction** class to `prediction/prediction.py` file
+* Test the prediction pipeline using `make_predictions.py` file
+  * Open the terminal and run the following command
+  ```bash
+  python make_predictions.py
+  ```
+
 ## App
 * The app is a Flask application that serves the model
 * The app is defined in the `app.py` file
-* We can either use the **training_pipeline.py** or the **main.py** to run the project in `app.py`
+* We use the `prediction/prediction.py` file to run the project predictions in `app.py`
 * This uses the FastAPI library to serve the model
   * /docs: Swagger UI for the API
   * /train: Train the model
-  * 
+  * /predict: Predict the model
+* To run the training pipeline through the flask app:
+  * Click `/train` Train Route endpoint
+  * Click `Try it out`
+  * Click `Execute`
+* The result is displayed in `templates/table.html`
+* Use `Jinja2Templates` to render the HTML template
+* We upload the data in CSV format to make predictions
+* The predictions are:
+  * Displayed in the `templates/table.html` file in HTML format
+  * The predictions are also saved in the `predictions` folder in CSV format
+  * A new collection is created in the MongoDB database with the predictions
+* Before running, make sure 
+  * mongodb exists
+  * Cluster exists
+  * Collection exists
+  * Collection have data
+  * The connection string is set in the `.env` file
+  * Use the below files to check connection and populate the database
+    * check_mongodb_connection.py
+    * push_data_mongodb.py
+* Open the terminal and run the following command to run the Flask app
+```bash
+# go into conda environment for the project by using conda activate <env_name>
+# python app.py
+uvicorn app:app --reload
+```

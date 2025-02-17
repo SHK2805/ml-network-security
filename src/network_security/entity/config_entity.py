@@ -68,6 +68,9 @@ class DataTransformationConfig:
                                             training_pipeline.data_transformation_final_preprocessing_object_dir)
         self.final_transformed_reprocessing_object_file_path = os.path.join(self.transformed_final_preprocessing_object_dir,
                                                   training_pipeline.data_transformation_final_preprocessing_object_file_name)
+        self.data_transformation_final_preprocessing_object_dir = training_pipeline.data_transformation_final_preprocessing_object_dir
+        self.data_transformation_final_preprocessing_object_file_name_path = os.path.join(self.data_transformation_final_preprocessing_object_dir,
+                                                  training_pipeline.data_transformation_final_preprocessing_object_file_name)
         # folder structure
         # - artifacts
         #   - data_transformation
@@ -87,6 +90,9 @@ class ModelTrainerConfig:
                                             training_pipeline.model_trainer_final_model_dir)
         self.final_model_file_path = os.path.join(self.final_model_dir,
                                                     training_pipeline.model_trainer_final_model_file_name)
+        self.model_trainer_final_model_dir = training_pipeline.model_trainer_final_model_dir
+        self.model_trainer_final_model_file_name_path = os.path.join(self.model_trainer_final_model_dir,
+                                                    training_pipeline.model_trainer_final_model_file_name)
 
         self.expected_accuracy = training_pipeline.model_trainer_expected_score
         self.overfitting_underfitting_threshold = training_pipeline.model_trainer_over_fitting_under_fitting_threshold
@@ -101,6 +107,15 @@ class ModelTrainerConfig:
         #           - preprocessing.pkl
         #       - saved_models
         #           - model.pkl
+
+class ModelPredictionConfig:
+    def __init__(self):
+        self.class_name = self.__class__.__name__
+        self.final_model_dir = training_pipeline.prediction_final_model_dir
+        self.final_model_file_name = training_pipeline.prediction_final_model_file_name
+        self.final_preprocessing_object_file_name = training_pipeline.prediction_final_preprocessing_object_file_name
+
+
 
 
 

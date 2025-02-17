@@ -6,7 +6,7 @@ from src.network_security.exception.exception import CustomException
 from src.network_security.logging.logger import logger
 
 class NetworkSecurityModel:
-    def __init__(self, preprocessor, model, model_name):
+    def __init__(self, preprocessor, model, model_name=None):
         try:
             self.class_name = self.__class__.__name__
             self.preprocessor = preprocessor

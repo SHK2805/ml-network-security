@@ -100,6 +100,20 @@ class DataTransformation:
                 os.makedirs(self.data_transformation_config.transformed_final_preprocessing_object_dir)
             save_object(self.data_transformation_config.final_transformed_reprocessing_object_file_path, processor)
 
+            """
+            save the final object in the final_models folder outside the artifacts folder
+            this so we can use the object to transform the data during prediction
+            we are saving the preprocessor object in both the artifacts/final_models folder and the final_models folder
+            artifacts/final_models is for reference and final_models is for prediction
+            """
+            if not os.path.exists(self.data_transformation_config.data_transformation_final_preprocessing_object_dir):
+                logger.info(f"{tag}::Creating final preprocessing object directory at: "
+                            f"{self.data_transformation_config.data_transformation_final_preprocessing_object_dir}")
+                os.makedirs(self.data_transformation_config.data_transformation_final_preprocessing_object_dir)
+            save_object(self.data_transformation_config.data_transformation_final_preprocessing_object_file_name_path, processor)
+
+
+
             # preparing artifacts
             artifact = DataTransformationArtifact(
                 transformed_object_file_path=self.data_transformation_config.transformed_object_file_path,

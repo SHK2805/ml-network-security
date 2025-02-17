@@ -51,6 +51,13 @@ class DataIngestion:
             database_name = self.data_ingestion_config.database_name
             collection_name = self.data_ingestion_config.collection_name
             self.mongodb_client = MongoClient(MONGO_DB_URL)
+
+            if self.check_mongodb_connection(self.mongodb_client, database_name, collection_name):
+                logger.info(f"{tag}::All mongodb checks passed.")
+            else:
+                logger.error(f"{tag}::One or more mongodb checks failed. Please check the logs for details.")
+                raise CustomException(f"{tag}::One or more mongodb checks failed. Please check the logs for details.", sys)
+
             # read all the data in the collection
             collection = self.mongodb_client[database_name][collection_name]
             # convert the collection to a dataframe
@@ -130,5 +137,43 @@ class DataIngestion:
         except Exception as e:
             logger.error(f"{tag}::Error in initiating data ingestion: {e}")
             raise CustomException(e, sys)
+
+    def check_mongodb_connection(self, database_client, database_name, collection_name) -> bool:
+        tag = f"{self.class_name}::check_mongodb_connection"
+        try:
+            # Connect to MongoDB
+            client = database_client
+            logger.info(f"{tag}::Connected to MongoDB")
+
+            # Check if the database exists
+            if database_name not in client.list_database_names():
+                logger.error(f"{tag}::Database '{database_name}' does not exist")
+                return False
+
+            logger.info(f"{tag}::Database '{database_name}' exists")
+
+            # Check if the collection exists
+            db = client[database_name]
+            if collection_name not in db.list_collection_names():
+                logger.error(f"{tag}::Collection '{collection_name}' does not exist in database '{database_name}'")
+                return False
+
+            logger.info(f"{tag}::Collection '{collection_name}' exists in database '{database_name}'")
+
+            # Check if there is data in the collection
+            collection = db[collection_name]
+            if collection.count_documents({}) == 0:
+                logger.error(f"{tag}::Collection '{collection_name}' in database '{database_name}' is empty")
+                return False
+
+            logger.info(f"{tag}::Collection '{collection_name}' in database '{database_name}' contains data")
+            return True
+
+        except Exception as e:
+            logger.error(f"{tag}::Error in connecting to MongoDB: {e}")
+            raise CustomException(e, sys)
+
+
+
 
 

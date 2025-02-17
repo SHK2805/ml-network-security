@@ -1,13 +1,23 @@
+from datetime import datetime
 import sys
 import os
+from typing import io
+
 import pandas as pd
 import certifi
 from dotenv import load_dotenv
 
+from src.network_security.constants import predictions_folder_name
 from src.network_security.constants.training_pipeline import (data_ingestion_database_name,
-                                                              data_ingestion_collection_name)
+                                                              data_ingestion_collection_name,
+                                                              data_transformation_final_preprocessing_object_dir,
+                                                              data_transformation_final_preprocessing_object_file_name,
+                                                              model_trainer_final_model_dir,
+                                                              model_trainer_final_model_file_name, target_column,
+                                                              artifact_dir)
 from src.network_security.exception.exception import CustomException
 from src.network_security.logging.logger import logger
+from src.network_security.prediction.prediction import PredictionPipeline
 from src.network_security.pipeline.training_pipeline import TrainingPipeline
 # Fixing the ImportError
 # ImportError: cannot import name 'MutableMapping' from 'collections'
@@ -15,6 +25,7 @@ from src.network_security.pipeline.training_pipeline import TrainingPipeline
 import collections
 from src.network_security.utils.environment import get_mongodb_uri, get_mongodb_name
 from src.network_security.utils.main_utils.utils import load_object
+from src.network_security.utils.ml_utils.model.estimator import NetworkSecurityModel
 
 # Fixing the ImportError
 collections.Iterable = collections.abc.Iterable
@@ -56,6 +67,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# templates
+from fastapi.templating import Jinja2Templates
+templates = Jinja2Templates(directory="./templates")
+
 # home page
 @app.get("/", tags=["authentication"])
 async def index():
@@ -67,6 +82,13 @@ async def train_route():
         train_pipeline=TrainingPipeline()
         train_pipeline.run_training_pipeline()
         return PlainTextResponse("Training is successful")
+    except Exception as e:
+        raise CustomException(e,sys)
+
+@app.get("/predict")
+async def predict_route(request: Request,file: UploadFile = File(...)):
+    try:
+        return PlainTextResponse("Prediction is successful")
     except Exception as e:
         raise CustomException(e,sys)
 

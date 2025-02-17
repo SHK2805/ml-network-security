@@ -56,3 +56,10 @@ model_trainer_final_model_dir: str = "final_models"
 model_trainer_final_model_file_name: str = "model.pkl"
 model_trainer_expected_score: float = 0.6
 model_trainer_over_fitting_under_fitting_threshold: float = 0.05
+
+# MODEL PREDICTION CONSTANTS
+prediction_final_model_dir: str = "final_models"
+prediction_final_preprocessing_object_file_name : str = "preprocessing.pkl"
+prediction_final_model_file_name: str = "model.pkl"
+
+

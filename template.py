@@ -104,10 +104,17 @@ def create_project_structure(project_name: str) -> bool:
             f"src/{project_name}/pipeline/model_trainer.py",
             f"src/{project_name}/pipeline/training_pipeline.py",
             f"src/{project_name}/pipeline/batch_prediction.py",
+            # prediction
+            f"src/{project_name}/prediction/__init__.py",
+            f"src/{project_name}/prediction/prediction.py",
             # main
             "main.py",
+            # make predictions
+            "make_predictions.py",
             # app
             "app.py",
+            # app templates
+            "templates/table.html",
         ]
 
         for filepath in list_of_files:

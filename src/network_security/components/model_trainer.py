@@ -248,14 +248,27 @@ class ModelTrainer:
             # create the final model directory if it does not exist
             final_model_dir_path = self.model_trainer_config.final_model_dir
             if not os.path.exists(final_model_dir_path):
-                logger.info(f"{tag}::Creating final model directory")
+                logger.info(f"{tag}::Creating final model directory: {final_model_dir_path}")
                 os.makedirs(final_model_dir_path, exist_ok=True)
             save_object(self.model_trainer_config.final_model_file_path, best_model)
 
             # check if the model is saved
             if not os.path.exists(self.model_trainer_config.trained_model_file_path):
                 logger.error(f"{tag}::Model not saved")
-                raise CustomException(f"{tag}::Model not saved", sys)
+                raise CustomException(f"{tag}::Model not saved at {self.model_trainer_config.trained_model_file_path}", sys)
+
+            # save the final model to a file
+            # create the final model directory if it does not exist
+            out_final_model_dir_path = self.model_trainer_config.model_trainer_final_model_dir
+            if not os.path.exists(out_final_model_dir_path):
+                logger.info(f"{tag}::Creating final model directory: {out_final_model_dir_path}")
+                os.makedirs(out_final_model_dir_path, exist_ok=True)
+            save_object(self.model_trainer_config.model_trainer_final_model_file_name_path, best_model)
+
+            # check if the model is saved
+            if not os.path.exists(self.model_trainer_config.trained_model_file_path):
+                logger.error(f"{tag}::Model not saved")
+                raise CustomException(f"{tag}::Model not saved at {self.model_trainer_config.trained_model_file_path}", sys)
 
             # model trainer artifact
             model_trainer_artifact: ModelTrainerArtifact = ModelTrainerArtifact(
