@@ -16,4 +16,6 @@ mlflow
 fastapi
 uvicorn
 python-multipart
+boto3
+botocore
 # -e .
