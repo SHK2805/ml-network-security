@@ -13,6 +13,7 @@
 - [Metrics](#metrics)
 - [MLFlow](#mlflow)
 - [Project steps](#project-steps)
+- [Cloud Deployment](#cloud-deployment)
 - [Coding Steps](#coding-steps)
 - [Coding Files](#coding-files)
 - [Data Ingestion](#data-ingestion)
@@ -21,11 +22,6 @@
 - [Model Trainer](#model-trainer)
 - [Pipelines](#pipelines)
 - [App](#app)
-- [Cloud Deployment](#cloud-deployment)
-
-
-## TODO
-* Push the preprocessor and model pickle files to S3 buckets instead of saving into the final_models folder
 
 
 ## Notes
@@ -212,7 +208,7 @@ var = os.getenv("VAR_NAME")
 * If you get the below error or similar errors while connecting to MongoDB Atlas, follow these steps:
 * The issue is the deprecation of some aliases from collections.abc into collections from python 3.10.
 * If you can't modify the importations in your scripts because of a third-party import
-* As a temporary workaround you can do the aliases manually before importing the problematic third-party lib. 
+* As a temporary workaround, you can do the aliases manually before importing the problematic third-party lib. 
 ```bash
 ImportError: cannot import name 'MutableMapping' from 'collections'
 ```
@@ -418,6 +414,46 @@ uvicorn app:app --reload
   * Save the model in the `artifacts/model_trainer/trained_model` folder
   * Save the model in the `artifacts/final_models` folder
 
+## Cloud Deployment
+### Configure
+* Before deploying to the cloud, make sure the `awscli` is installed
+  * The `awscli` is a command-line tool that provides commands for interacting with AWS services
+  * To install the `awscli` package, run the following command:
+  ```bash
+  pip install awscli
+  ```
+  * To configure the `awscli`, run the following command:
+  * Open the terminal and run the following command
+  ```bash
+  aws configure
+  ```
+    * Enter the following details:
+        * AWS Access Key ID
+        * AWS Secret Access Key
+        * Default region name
+        * Default output format
+* Before deploying to the cloud, make sure the `boto3` and `botocore` packages are installed
+* Add `boto3` and `botocore` to the `requirements.txt` file
+  * The `boto3` is the AWS SDK for Python
+  * The `botocore` is the low-level, core functionality of the AWS SDK for Python
+* To install the `boto3` and `botocore` packages manually, run the following command:
+```bash
+pip install boto3 botocore
+```
+### S3 Bucket
+* Once the models are trained and the app is ready, we can deploy them to **s3 bucket** in AWS
+* We can use the `boto3` library to upload the files to the s3 bucket
+  * We use this to create the stack using the `cloudformation` template
+  * The cloudformation template and the python code for the stack creation is in the `network_security/cloud` folder
+    * **s3_create.yaml** file is the cloudformation template
+    * **deploy.py** a file is the python code to create the stack
+* We can use the `awscli` to upload the files to the s3 bucket
+  * We are using this method to upload to the s3 bucket
+* The **preprocessor** and **model** pickle files are uploaded to the s3 bucket from the `final_models` folder
+  *  The entire `final_models` folder is synced to the s3 bucket
+* The `artifacts` folder is uploaded to the s3 bucket
+  * The entire `artifacts` folder is synced to the s3 bucket
+
 ## Coding Steps
 * Constants
 * Configuration
@@ -615,6 +651,23 @@ uvicorn app:app --reload
   * The final best model is saved in the `artifacts/final_models` folder
 * **Step5**: Add **ModelTrainer** class to `pipeline/model_trainer.py` file
 
+### Model Pusher
+#### Steps
+* Configure the `awscli` and `boto3` packages
+* Run the `deploy.py` file to create the cloud stack
+* Make sure the s3 bucket is created 
+* Get the `artifacts` folder and push the files to the s3 bucket
+* Get the model and pre-processor pickle from the `final_models` folder and push the model to the cloud aws s3 bucket
+
+#### Coding Steps
+* **Step1**: Add **MODEL PUSHER** constants to `constants/cloud_pipeline/__init__.py` file
+* **Step2**: Add **ModelPusherConfig** class to `entity/config_entity.py` file
+  * In here we create `ModelPusherConfig` class with as class variables for model and model file paths
+* **Step3**: Add **ModelPusherArtifact** class to `entity/artifact_entity.py` file with paths to test and train data
+* **Step4**: Add **ModelPusher** class to `components/model_pusher.py` file
+  * In here we create `ModelPusher` class
+  * The `push` function is used to push the model and artifacts to the s3 bucket
+
 ## Pipelines
 #### Main.py
 * The project is divided into multiple pipelines
@@ -682,43 +735,3 @@ uvicorn app:app --reload
 # python app.py
 uvicorn app:app --reload
 ```
-
-## Cloud Deployment
-### Configure
-* Before deploying to the cloud, make sure the `awscli` is installed
-  * The `awscli` is a command-line tool that provides commands for interacting with AWS services
-  * To install the `awscli` package, run the following command:
-  ```bash
-  pip install awscli
-  ```
-  * To configure the `awscli`, run the following command:
-  * Open the terminal and run the following command
-  ```bash
-  aws configure
-  ```
-    * Enter the following details:
-        * AWS Access Key ID
-        * AWS Secret Access Key
-        * Default region name
-        * Default output format
-* Before deploying to the cloud, make sure the `boto3` and `botocore` packages are installed
-* Add `boto3` and `botocore` to the `requirements.txt` file
-  * The `boto3` is the AWS SDK for Python
-  * The `botocore` is the low-level, core functionality of the AWS SDK for Python
-* To install the `boto3` and `botocore` packages manually, run the following command:
-```bash
-pip install boto3 botocore
-```
-### S3 Bucket
-* Once the models are trained and the app is ready, we can deploy them to **s3 bucket** in AWS
-* We can use the `boto3` library to upload the files to the s3 bucket
-  * We use this to create the stack using the `cloudformation` template
-  * The cloudformation template and the python code for the stack creation is in the `network_security/cloud` folder
-    * **s3_create.yaml** file is the cloudformation template
-    * **deploy.py** a file is the python code to create the stack
-* We can use the `awscli` to upload the files to the s3 bucket
-  * We are using this method to upload to the s3 bucket
-* The **preprocessor** and **model** pickle files are uploaded to the s3 bucket from the `final_models` folder
-  *  The entire `final_models` folder is synced to the s3 bucket
-* The `artifacts` folder is uploaded to the s3 bucket
-  * The entire `artifacts` folder is synced to the s3 bucket

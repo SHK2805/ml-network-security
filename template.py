@@ -69,6 +69,9 @@ def create_project_structure(project_name: str) -> bool:
             f"src/{project_name}/utils/ml_utils/metric/classification_metrics.py",
             f"src/{project_name}/utils/ml_utils/model/__init__.py",
             f"src/{project_name}/utils/ml_utils/model/estimator.py",
+            # cloud utils
+            f"src/{project_name}/utils/cloud_utils/__init__.py",
+            f"src/{project_name}/utils/cloud_utils/s3.py",
             # other utils
             f"src/{project_name}/utils/delete_directories.py",
             f"src/{project_name}/utils/environment.py",
@@ -99,6 +102,7 @@ def create_project_structure(project_name: str) -> bool:
             f"src/{project_name}/components/data_validation.py",
             f"src/{project_name}/components/data_transformation.py",
             f"src/{project_name}/components/model_trainer.py",
+            f"src/{project_name}/components/model_pusher.py",
             # pipeline
             f"src/{project_name}/pipeline/__init__.py",
             f"src/{project_name}/pipeline/data_ingestion.py",

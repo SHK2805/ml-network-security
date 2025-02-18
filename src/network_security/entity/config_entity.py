@@ -1,6 +1,7 @@
 import os.path
 from src.network_security.constants import training_pipeline
 from src.network_security.config.configuration import TrainingPipelineConfig
+from src.network_security.constants.cloud_pipeline import *
 
 
 class DataIngestionConfig:
@@ -114,6 +115,17 @@ class ModelPredictionConfig:
         self.final_model_dir = training_pipeline.prediction_final_model_dir
         self.final_model_file_name = training_pipeline.prediction_final_model_file_name
         self.final_preprocessing_object_file_name = training_pipeline.prediction_final_preprocessing_object_file_name
+
+
+class ModelPusherConfig:
+    def __init__(self, training_pipeline_config: TrainingPipelineConfig):
+        self.class_name = self.__class__.__name__
+        self.s3_artifact_dir = training_pipeline_config.artifact_dir
+        self.final_model_dir = final_model_dir
+        self.s3_region_name = s3_region
+        self.s3_bucket_name = s3_bucket_name
+
+
 
 
 

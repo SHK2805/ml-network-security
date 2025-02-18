@@ -40,3 +40,9 @@ class ModelTrainerArtifact:
     trained_model_file_path: str
     train_metric_artifact: ClassificationMetricArtifact
     test_metric_artifact: ClassificationMetricArtifact
+
+@dataclass
+class ModelPusherArtifact:
+    model_pushed: bool
+    model_s3_path: str
+    artifact_s3_path: str
