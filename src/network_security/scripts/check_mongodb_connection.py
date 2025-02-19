@@ -20,6 +20,7 @@ from pymongo.mongo_client import MongoClient
 
 class MongoDBConnector:
     def __init__(self):
+        self.class_name = self.__class__.__name__
         self.client = None
 
     def load_env(self):
@@ -36,9 +37,10 @@ class MongoDBConnector:
 
     def ping_mongo_client(self):
         """Pings the MongoDB client to confirm connection."""
+        tag: str = f"[{self.class_name}][{self.ping_mongo_client.__name__}]::"
         try:
             self.client.admin.command('ping')
-            logger.info("Pinged your deployment. You successfully connected to MongoDB!")
+            logger.info(f"{tag}>>>>>>>>>> MongoDB connection successful! <<<<<<<<<<")
         except Exception as e:
             logger.error(f"An error occurred while trying to ping your deployment: {e}")
             raise CustomException(e, sys)

@@ -46,7 +46,8 @@ class NetworkDataExtract:
         return get_mongodb_uri()
 
     def read_csv(self, file_path):
-        tag: str = self.class_name + "::read_csv"
+        tag: str = f"[{self.class_name}][{self.read_csv.__name__}]::"
+
         try:
             df = pd.read_csv(file_path)
             df.reset_index(drop=True, inplace=True)
@@ -57,7 +58,7 @@ class NetworkDataExtract:
             raise CustomException(e, sys)
 
     def cv_to_json(self, file_path):
-        tag: str = self.class_name + "::cv_to_json"
+        tag: str = f"[{self.class_name}][{self.cv_to_json.__name__}]::"
         try:
             df = self.read_csv(file_path)
             records = json.loads(df.to_json(orient='records'))
@@ -69,7 +70,7 @@ class NetworkDataExtract:
 
     def connect_to_mongodb(self):
         """Creates a MongoDB client and connects to the database."""
-        tag: str = self.class_name + "::connect_to_mongodb"
+        tag: str = f"[{self.class_name}][{self.connect_to_mongodb.__name__}]::"
         try:
             self.client = MongoClient(self.mongo_uri)
             self.database = self.client[self.database_name]
@@ -80,12 +81,13 @@ class NetworkDataExtract:
             raise CustomException(e, sys)
 
     def insert_data_mongodb(self, records):
-        tag: str = self.class_name + "::insert_data_mongodb"
+        tag: str = f"[{self.class_name}][{self.insert_data_mongodb.__name__}]::"
+        count = 0
         try:
             self.collection.insert_many(records)
             count = self.collection.count_documents({})
             logger.info(f"{tag}::Total records inserted into MongoDB: {count}")
-            return count
+
         except Exception as e:
             logger.error(f"{tag}::Error in inserting data into MongoDB: {e}")
             raise CustomException(e, sys)
@@ -94,7 +96,10 @@ class NetworkDataExtract:
                 self.client.close()
                 logger.info(f"{tag}::MongoDB connection closed.")
 
+        return count
+
     def process(self, file_path):
+        tag: str = f"[{self.class_name}][{self.process.__name__}]::"
         records = self.cv_to_json(file_path)
         self.connect_to_mongodb()
         count = self.insert_data_mongodb(records)
@@ -102,7 +107,7 @@ class NetworkDataExtract:
         return count
 
 def main():
-    tag: str = "push_data_mongodb::main"
+    tag: str = "[push_data_mongodb][main]"
     try:
         file_path = os.path.join(Path(__file__).parent.parent.parent.parent, Path(data_file_folder_name, data_file_name))
         if not os.path.exists(file_path):

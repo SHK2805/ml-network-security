@@ -1,6 +1,7 @@
 import os
 import sys
 
+from src.network_security.components.model_pusher import ModelPusher
 from src.network_security.exception.exception import CustomException
 from src.network_security.logging.logger import logger
 
@@ -15,7 +16,7 @@ from src.network_security.entity.config_entity import (TrainingPipelineConfig,
                                                        DataIngestionConfig,
                                                        DataValidationConfig,
                                                        DataTransformationConfig,
-                                                       ModelTrainerConfig)
+                                                       ModelTrainerConfig, ModelPusherConfig)
 
 # import artifact entity
 from src.network_security.entity.artifact_entity import (DataIngestionArtifact,
@@ -84,6 +85,20 @@ class TrainingPipeline:
             logger.error(f"{tag}::Error running the model training pipeline: {e}")
             raise CustomException(e, sys)
 
+    def run_pusher_pipeline(self):
+        tag: str = f"{self.class_name}::run_pusher_pipeline::"
+        try:
+            logger.info(f"{tag}::Model pusher configuration started")
+            model_pusher_config: ModelPusherConfig = ModelPusherConfig(self.config)
+            model_pusher: ModelPusher = ModelPusher(config=model_pusher_config)
+            logger.info(f"{tag}::Model pusher object created")
+            logger.info(f"{tag}::Running the model pusher pipeline")
+            model_pusher.push()
+            logger.info(f"{tag}::Model pusher pipeline completed")
+        except Exception as e:
+            logger.error(f"{tag}::Error running the model pusher pipeline: {e}")
+            raise CustomException
+
     def run_training_pipeline(self):
         tag: str = f"{self.class_name}::run_training_pipeline::"
         try:
@@ -94,6 +109,17 @@ class TrainingPipeline:
             model_trainer_artifact = self.run_model_trainer_pipeline(data_transformation_artifact=data_transformation_artifact)
             logger.info(f"[COMPLETE]>>>>>>>>>>>>>>>>>>>> {self.stage_name} <<<<<<<<<<<<<<<<<<<<\n\n\n")
             return model_trainer_artifact
+        except Exception as e:
+            logger.error(f"{tag}::Error running the training pipeline: {e}")
+            raise CustomException(e, sys)
+
+    def run(self):
+        tag: str = f"{self.class_name}::run::"
+        try:
+            logger.info(f"{tag}::Training pipeline started")
+            self.run_training_pipeline()
+            self.run_pusher_pipeline()
+            logger.info(f"{tag}::Training pipeline completed")
         except Exception as e:
             logger.error(f"{tag}::Error running the training pipeline: {e}")
             raise CustomException(e, sys)

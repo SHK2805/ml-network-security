@@ -7,6 +7,7 @@ from src.network_security.entity.artifact_entity import (DataIngestionArtifact,
 from src.network_security.pipeline.data_ingestion import DataIngestionTrainingPipeline
 from src.network_security.pipeline.data_transformation import DataTransformationTrainingPipeline
 from src.network_security.pipeline.data_validation import DataValidationTrainingPipeline
+from src.network_security.pipeline.model_pusher import ModelPusherTrainingPipeline
 from src.network_security.pipeline.model_trainer import ModelTrainerTrainingPipeline
 
 
@@ -75,12 +76,27 @@ class RunPipeline:
             logger.error(f"{tag}::Error running the model trainer pipeline: {e}")
             raise CustomException(e, sys)
 
+    def run_model_pusher_pipeline(self) -> None:
+        tag: str = f"{self.class_name}::run_model_pusher_pipeline::"
+        try:
+            model_pusher_pipeline: ModelPusherTrainingPipeline = ModelPusherTrainingPipeline()
+            logger.info(f"[STARTED]>>>>>>>>>>>>>>>>>>>> {model_pusher_pipeline.stage_name} <<<<<<<<<<<<<<<<<<<<")
+            logger.info(f"{tag}::Running the model pusher pipeline")
+            model_pusher_pipeline.model_pusher()
+            logger.info(f"{tag}::Model pusher pipeline completed")
+            logger.info(
+                f"[COMPLETE]>>>>>>>>>>>>>>>>>>>> {model_pusher_pipeline.stage_name} <<<<<<<<<<<<<<<<<<<<\n\n\n")
+        except Exception as e:
+            logger.error(f"{tag}::Error running the model pusher pipeline: {e}")
+            raise CustomException(e, sys)
+
 
     def run(self) -> None:
         data_ingestion_artifact: DataIngestionArtifact = self.run_data_ingestion_pipeline()
         data_validation_artifact: DataValidationArtifact = self.run_data_validation_pipeline(data_ingestion_artifact)
         data_transformation_artifact: DataTransformationArtifact = self.run_data_transformation_pipeline(data_validation_artifact)
-        model_trainer_artifact: ModelTrainerArtifact = self.run_model_trainer_pipeline(data_transformation_artifact)
+        self.run_model_trainer_pipeline(data_transformation_artifact)
+        self.run_model_pusher_pipeline()
 
 if __name__ == "__main__":
     try:

@@ -4,7 +4,10 @@ import boto3
 import botocore
 from botocore.exceptions import ClientError
 
-from src.network_security.constants.cloud_pipeline import s3_region, s3_stack_name, s3_bucket_name, s3_cf_template
+from src.network_security.constants.cloud_pipeline import (s3_region,
+                                                           s3_stack_name,
+                                                           s3_bucket_name,
+                                                           s3_cf_template)
 from src.network_security.exception.exception import CustomException
 from src.network_security.logging.logger import logger
 

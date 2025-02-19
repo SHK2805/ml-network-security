@@ -667,6 +667,7 @@ pip install boto3 botocore
 * **Step4**: Add **ModelPusher** class to `components/model_pusher.py` file
   * In here we create `ModelPusher` class
   * The `push` function is used to push the model and artifacts to the s3 bucket
+* **Step5**: Add **ModelPusher** class to `pipeline/model_pusher.py` file
 
 ## Pipelines
 #### Main.py
