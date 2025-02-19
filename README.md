@@ -2,6 +2,7 @@
 
 ## Table of Contents
 - [Notes](#notes)
+- [Checks](#checks)
 - [Simple Steps](#simple-steps)
 - [Setup Conda Environment](#setup-conda-environment)
 - [Using Git](#using-git)
@@ -29,6 +30,13 @@
 ## Notes
 * If you have added `.github/workflows/main.yml` then disable the workflows in the GitHub repository settings till the correct code is added
 
+## Checks
+* MongoDB database, collection and data
+* MongoDB connection
+* AWS stack s3 bucket and ECR
+* GitHub Secrets and correct values for ECR and others
+* Data in `phishingdata` folder
+
 ## Simple Steps
 * Create a new conda environment
 * Activate the conda environment
@@ -40,6 +48,7 @@
 * Run the `main.py` file to run the training pipeline
 * Run the `make_predictions.py` file to run the prediction pipeline
 * Run the `clean.py` file to clean the generated files and folders
+* If you push the code to the GitHub repository, the workflows will run automatically
 
 ## Setup Conda Environment
 To set up the Conda environment for this project, follow these steps:
@@ -442,15 +451,41 @@ uvicorn app:app --reload
 ```bash
 pip install boto3 botocore
 ```
-### S3 Bucket
+### CloudFormation
 * Once the models are trained and the app is ready, we can deploy them to **s3 bucket** in AWS
 * We can use the `boto3` library to upload the files to the s3 bucket
   * We use this to create the stack using the `cloudformation` template
   * The cloudformation template and the python code for the stack creation is in the `network_security/cloud` folder
-    * **s3_create.yaml** file is the cloudformation template
-    * **deploy.py** a file is the python code to create the stack
+    * **cloudformation_template.yaml** file is the cloudformation template
+    ##### Parameters
+    * **BucketName**: The name of the S3 bucket to be created.
+    * **ECRRepositoryName**: The name of the ECR repository to be created.
+    ##### Resources
+    * **Bucket**: An AWS::S3::Bucket resource that creates an S3 bucket with the specified name. The bucket is configured with server-side encryption using AWS Key Management Service (KMS).
+    * **BucketBucketPolicy**: An AWS::S3::BucketPolicy resource that applies a bucket policy to enforce secure transport (HTTPS) for accessing the S3 bucket.
+    * **ECRRepository**: An AWS::ECR::Repository resource that creates an ECR repository with the specified name. The repository is configured with a lifecycle policy to expire images older than 30 days.
+    ##### Outputs
+    * **BucketName**: The name of the created S3 bucket.
+    * **ECRRepositoryName**: The name of the created ECR repository.
+    * **ECRRepositoryUri**: The URI of the created ECR repository.
+  * **deploy.py** a file is the python code to create the stack
+    * Imports: It imports the necessary modules and custom classes for AWS CloudFormation management. 
+    * CloudFormationManager Class:
+      * Initialization: Initializes the class with AWS CloudFormation, Logs, and S3 clients. 
+      * Stack Existence Check: Checks if the specified CloudFormation stack exists.
+      * Create Stack: Creates a CloudFormation stack using the provided template and waits for the creation or update to complete. 
+        * If the stack exists, will update the stack else will create the stack.
+      * Delete Stack: Delete the specified CloudFormation stack and associated log groups.
+      * Delete Log Groups: Delete CloudWatch log groups associated with the stack. 
+      * Print Stack Outputs: Prints the outputs of the stack. 
+      * Get Stack Output: Returns the outputs of the stack for a specific key.
+    * Main Function: 
+      * Read the CloudFormation template. 
+      * Initializes the CloudFormationManager with the specified region, stack name, and bucket name. 
+      * Creates the CloudFormation stack.
+      * Prints the stack outputs.
 * We can use the `awscli` to upload the files to the s3 bucket
-  * We are using this method to upload to the s3 bucket
+  * We are using this method to upload to the s3 bucket using the code in the `utils/cloud_utils/s3.py` file
 * The **preprocessor** and **model** pickle files are uploaded to the s3 bucket from the `final_models` folder
   *  The entire `final_models` folder is synced to the s3 bucket
 * The `artifacts` folder is uploaded to the s3 bucket
@@ -768,3 +803,18 @@ docker compose down
 ## GitHub Actions
 * We can use GitHub Actions to automate the CI/CD process
 * The GitHub Actions workflow is defined in the `.github/workflows` directory in the `main.yml` file
+* If you are using the `main` branch, the workflow is triggered when you push the code to the `main` branch
+* The aws credentials are set in the GitHub Secrets
+  * Go to the GitHub repository
+  * Go to your project repository
+  * Click on `Settings`
+  * Click on `Secrets and variables`
+  * Click on `Actions`
+  * Under `Repository secrets`, click on `New repository secret`
+  * Add the below secrets to connect to aws and login to ecr
+    * AWS_ACCESS_KEY_ID
+    * AWS_SECRET_ACCESS_KEY
+    * AWS_REGION
+    * AWS_ECR_LOGIN_URI
+    * AWS_ECR_REPOSITORY_NAME 
+    * AWS_ACCOUNT_ID

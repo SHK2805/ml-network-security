@@ -6,6 +6,10 @@ Parameters:
     Type: String
     Description: Name of the S3 bucket
 
+  ECRRepositoryName:
+    Type: String
+    Description: Name of the ECR repository
+
 Resources:
   Bucket:
     Type: AWS::S3::Bucket
@@ -33,8 +37,39 @@ Resources:
             Condition:
               Bool:
                 aws:SecureTransport: 'false'
+  ECRRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Ref ECRRepositoryName
+      LifecyclePolicy:
+        LifecyclePolicyText: |
+          {
+            "rules": [
+              {
+                "rulePriority": 1,
+                "description": "Expire images older than 30 days",
+                "selection": {
+                  "tagStatus": "any",
+                  "countType": "sinceImagePushed",
+                  "countUnit": "days",
+                  "countNumber": 30
+                },
+                "action": {
+                  "type": "expire"
+                }
+              }
+            ]
+          }
 
 Outputs:
   BucketName:
     Description: Name of the S3 bucket
     Value: !Ref Bucket
+
+  ECRRepositoryName:
+    Description: Name of the ECR repository
+    Value: !Ref ECRRepository
+
+  ECRRepositoryUri:
+    Description: URI of the ECR repository
+    Value: !GetAtt ECRRepository.RepositoryUri
