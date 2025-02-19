@@ -22,6 +22,8 @@
 - [Model Trainer](#model-trainer)
 - [Pipelines](#pipelines)
 - [App](#app)
+- [Docker](#docker)
+- [GitHub Actions](#github-actions)
 
 
 ## Notes
@@ -736,3 +738,33 @@ pip install boto3 botocore
 # python app.py
 uvicorn app:app --reload
 ```
+
+## Docker
+* We can use Docker to containerize the application
+* The Dockerfile is defined in the root directory
+* The docker-compose file is defined in the root directory
+* We need **aws** credentials to push the docker image to the **aws** ECR and the models to the **s3** bucket
+* The **aws** credentials are set in the **.env** file
+  * The **.env** file is used to set the environment variables
+```palintext
+AWS_ACCESS_KEY_ID=<value>
+AWS_SECRET_ACCESS_KEY=<value>
+```
+* The **.env** file is added to the **.gitignore** file
+* The credentials then are used in the **docker-compose** file
+```commandline
+environment:
+  - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+  - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+```
+* The **docker-compose** file is used to build the docker image and run the container
+```bash
+# start the docker container
+docker compose up
+# stop the docker container
+docker compose down
+```
+
+## GitHub Actions
+* We can use GitHub Actions to automate the CI/CD process
+* The GitHub Actions workflow is defined in the `.github/workflows` directory in the `main.yml` file

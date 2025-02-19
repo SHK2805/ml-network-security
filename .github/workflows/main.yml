@@ -1,0 +1,35 @@
+name: Build and Push Docker image to ECR
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'README.md'
+      - 'docs/**'
+      - '.editorconfig'
+      - '.gitattributes'
+      - '.gitignore'
+      - 'CHANGELOG.md'
+      - 'LICENSE'
+      - 'LICENSE.txt'
+      - '**/*.md'
+      - '.github/workflows/**'
+      - '**/*.png'
+      - '**/*.jpg'
+      - '**/*.jpeg'
+      - '**/*.gif'
+      - '**/*.svg'
+      - '.env'
+
+jobs:
+  integration:
+    name: CI/CD Pipeline
+    runs-on: ubuntu-latest
+    steps:
+        - name: Checkout
+          uses: actions/checkout@v3
+
+        - name: Echo something
+          run: |
+            echo "This is a test"
