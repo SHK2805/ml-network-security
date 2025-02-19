@@ -14,7 +14,6 @@ on:
       - 'LICENSE'
       - 'LICENSE.txt'
       - '**/*.md'
-      - '.github/workflows/**'
       - '**/*.png'
       - '**/*.jpg'
       - '**/*.jpeg'
