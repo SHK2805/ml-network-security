@@ -4,6 +4,9 @@ services:
     build: .
     ports:
       - "8000:8000"
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
     volumes:
       - .:/app # Mount the current directory to the container's /app directory
       - /dev/shm:/dev/shm  # Map host's shared memory directory to container's shared memory directory, this will avoaid the error of "OSError: [Errno 28] No space left on device"
