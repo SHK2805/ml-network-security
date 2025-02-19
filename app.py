@@ -1,33 +1,19 @@
-from datetime import datetime
 import sys
-import os
-from typing import io
+import sys
 
-import pandas as pd
 import certifi
 from dotenv import load_dotenv
 
-from src.network_security.constants import predictions_folder_name
 from src.network_security.constants.training_pipeline import (data_ingestion_database_name,
-                                                              data_ingestion_collection_name,
-                                                              data_transformation_final_preprocessing_object_dir,
-                                                              data_transformation_final_preprocessing_object_file_name,
-                                                              model_trainer_final_model_dir,
-                                                              model_trainer_final_model_file_name, target_column,
-                                                              artifact_dir)
+                                                              data_ingestion_collection_name)
 from src.network_security.exception.exception import CustomException
-from src.network_security.logging.logger import logger
-from src.network_security.prediction.prediction import PredictionPipeline
 from src.network_security.pipeline.training_pipeline import TrainingPipeline
+from src.network_security.utils.environment import get_mongodb_uri, get_mongodb_name
+
 # Fixing the ImportError
 # ImportError: cannot import name 'MutableMapping' from 'collections'
 # add this before MongoClient import
 import collections
-from src.network_security.utils.environment import get_mongodb_uri, get_mongodb_name
-from src.network_security.utils.main_utils.utils import load_object
-from src.network_security.utils.ml_utils.model.estimator import NetworkSecurityModel
-
-# Fixing the ImportError
 collections.Iterable = collections.abc.Iterable
 collections.Mapping = collections.abc.Mapping
 collections.MutableSet = collections.abc.MutableSet
@@ -35,12 +21,10 @@ collections.MutableMapping = collections.abc.MutableMapping
 collections.Sequence = collections.abc.Sequence
 # add fix before importing MongoClient
 from pymongo.mongo_client import MongoClient
-import pymongo
 
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, File, UploadFile,Request
-from uvicorn import run as app_run
-from fastapi.responses import Response
+from uvicorn import run as app_run # this will run the app using python app.py
 from starlette.responses import RedirectResponse
 from fastapi.responses import PlainTextResponse
 
@@ -80,7 +64,7 @@ async def index():
 async def train_route():
     try:
         train_pipeline=TrainingPipeline()
-        train_pipeline.run_training_pipeline()
+        train_pipeline.run()
         return PlainTextResponse("Training is successful")
     except Exception as e:
         raise CustomException(e,sys)

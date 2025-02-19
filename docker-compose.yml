@@ -1,0 +1,10 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app # Mount the current directory to the container's /app directory
+      - /dev/shm:/dev/shm  # Map host's shared memory directory to container's shared memory directory, this will avoaid the error of "OSError: [Errno 28] No space left on device"
+        # shm_size: '256m' # Adjust the size as needed to avoid the error of "OSError: [Errno 28] No space left on the device"
