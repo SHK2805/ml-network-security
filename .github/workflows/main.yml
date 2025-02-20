@@ -108,7 +108,7 @@ jobs:
         # docker pull ${{ needs.build-and-push-ecr-image.outputs.image }}
         run: |
           echo "Pulling Docker image from Amazon ECR"
-          docker pull ${{ secrets.AWS_ECR_LOGIN_URI }}/${{AWS_ECR_REPOSITORY_NAME}}:${{ github.sha }}
+          docker pull ${{ secrets.AWS_ECR_LOGIN_URI }}/${{secrets.AWS_ECR_REPOSITORY_NAME}}:${{ github.sha }}
           echo "Docker image pulled from Amazon ECR"
 
       - name: Stop and remove container if running
