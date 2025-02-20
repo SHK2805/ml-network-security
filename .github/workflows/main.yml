@@ -105,9 +105,10 @@ jobs:
 
       - name: Deploy Docker image to EC2 from ECR
         id: deploy-image
+        # docker pull ${{ needs.build-and-push-ecr-image.outputs.image }}
         run: |
           echo "Pulling Docker image from Amazon ECR"
-          docker pull ${{ needs.build-and-push-ecr-image.outputs.image }}
+          docker pull ${{ secrets.AWS_ECR_LOGIN_URI }}/${{AWS_ECR_REPOSITORY_NAME}}:${{ github.sha }}
           echo "Docker image pulled from Amazon ECR"
 
       - name: Stop and remove container if running
@@ -123,7 +124,7 @@ jobs:
         id: run-container
         run: |
           echo "Running Docker container on EC2"
-          docker run -d -p 8000:8000 --ipc="host" --name=networksecurity -e 'AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}' -e 'AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}' -e 'AWS_REGION=${{ secrets.AWS_REGION }}' ${{ needs.build-and-push-ecr-image.outputs.image }}
+          docker run -d -p 8000:8000 --ipc="host" --name=networksecurity -e 'AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}' -e 'AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}' -e 'AWS_REGION=${{ secrets.AWS_REGION }}' ${{ secrets.AWS_ECR_LOGIN_URI }}/${{AWS_ECR_REPOSITORY_NAME}}:${{ github.sha }}
           echo "Docker container running on EC2"
 
       - name: Check Docker container status
