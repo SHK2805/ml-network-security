@@ -12,6 +12,7 @@ class CloudFormationManager:
     def __init__(self, cfm_region_name=region_name,
                        cfm_stack_name=stack_name,
                        cfm_s3_bucket_name=s3_bucket_name,
+                       cfm_key_pair_name=key_pair_name,
                        cfm_ecr_name=ecr_repository_name):
         """Initialize the CloudFormationManager with AWS clients."""
         self.cf_client = boto3.client('cloudformation', region_name=cfm_region_name)
@@ -19,6 +20,7 @@ class CloudFormationManager:
         self.s3_client = boto3.client('s3', region_name=cfm_region_name)
         self.stack_name = cfm_stack_name
         self.bucket_name = cfm_s3_bucket_name
+        self.key_pair_name = cfm_key_pair_name
         self.ecr_repository_name = cfm_ecr_name
         logger.info(f"CloudFormationManager object initialized with stack name: "
                     f"{self.stack_name} "
@@ -63,6 +65,10 @@ class CloudFormationManager:
                         {
                             'ParameterKey': 'ECRRepositoryName',
                             'ParameterValue': self.ecr_repository_name
+                        },
+                        {
+                            'ParameterKey': 'KeyPairName',
+                            'ParameterValue': self.key_pair_name
                         }
                     ],
                     Capabilities=['CAPABILITY_NAMED_IAM', 'CAPABILITY_IAM']

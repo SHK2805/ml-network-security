@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Create S3 bucket with necessary configurations
+Description: Create S3 bucket, ECR repository, and EC2 instance with necessary configurations
 
 Parameters:
   BucketName:
@@ -9,6 +9,10 @@ Parameters:
   ECRRepositoryName:
     Type: String
     Description: Name of the ECR repository
+
+  KeyPairName:
+    Type: String
+    Description: Name of the EC2 Key Pair
 
 Resources:
   Bucket:
@@ -20,6 +24,7 @@ Resources:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: aws:kms
               KMSMasterKeyID: alias/aws/s3
+
   BucketBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
@@ -37,6 +42,7 @@ Resources:
             Condition:
               Bool:
                 aws:SecureTransport: 'false'
+
   ECRRepository:
     Type: AWS::ECR::Repository
     Properties:
@@ -61,6 +67,38 @@ Resources:
             ]
           }
 
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow access on port 8000 and 22
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 8000
+          ToPort: 8000
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      KeyName: !Ref KeyPairName
+      SecurityGroups:
+        - !Ref SecurityGroup
+      ImageId: ami-04b4f1a9cf54c11d0 # Ubuntu Server 24.04 LTS (HVM),EBS General Purpose (SSD) Volume Type. Support available from Canonical
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          sudo apt-get update -y
+          sudo apt-get upgrade -y
+          curl -fsSL https://get.docker.com -o get-docker.sh
+          sudo sh get-docker.sh
+          sudo usermod -aG docker ubuntu
+          newgrp docker
+
 Outputs:
   BucketName:
     Description: Name of the S3 bucket
@@ -73,3 +111,11 @@ Outputs:
   ECRRepositoryUri:
     Description: URI of the ECR repository
     Value: !GetAtt ECRRepository.RepositoryUri
+
+  EC2InstanceId:
+    Description: ID of the EC2 instance
+    Value: !Ref EC2Instance
+
+  EC2PublicIp:
+    Description: Public IP of the EC2 instance
+    Value: !GetAtt EC2Instance.PublicIp

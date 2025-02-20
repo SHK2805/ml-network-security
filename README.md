@@ -818,3 +818,53 @@ docker compose down
     * AWS_ECR_LOGIN_URI
     * AWS_ECR_REPOSITORY_NAME 
     * AWS_ACCOUNT_ID
+* The `ec2` instance is used to host the `ecr` repository
+* Once the `ec2` instance is created, run the below commands but connecting to it
+* These can be added to the cloudformation template
+```bash
+sudo apt-get update -y
+sudo apt-get upgrade -y
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+sudo usermod -aG docker ubuntu
+newgrp docker
+```
+* The runner is configured to be `self-hosted`
+* n GitHub Actions, runners are the applications that execute the jobs defined in your workflows. 
+* They can be hosted by GitHub or self-hosted in your own environment
+  * To set up a self-hosted runner, you need to:
+    * Add a Self-Hosted Runner: 
+      * Go to the repository settings on GitHub
+      * Navigate to the "Actions" tab
+      * Click on "Runners." 
+      * Follow the instructions to add a new self-hosted runner. 
+      * Since we are running the app in a **Linux** environment, select **runner image** for **Linux**
+    * Download and Configure the Runner or copy the instructions and paste in **ec2** instance terminal: 
+      * Download and Configure
+        * Download the runner application for your platform (Linux, macOS, or Windows)
+        * Extract it
+        * Configure it using the provided token and repository URL.
+      * Copy and paste the bash commands in the **ec2** instance terminal
+      * The runner is configured to be `self-hosted`
+      ```bash
+      # Runner Registration
+      Enter the name of the runner group to add this runner to: [press Enter for Default]             
+      Enter the name of runner: [press Enter for ip-172-31-87-31] self-hosted 
+      This runner will have the following labels: 'self-hosted', 'Linux', 'X64' 
+      Enter any additional labels (ex. label-1,label-2): [press Enter to skip] 
+      √ Runner successfully added
+      √ Runner connection is good
+      # Runner settings
+      Enter name of work folder: [press Enter for _work] 
+      √ Settings Saved.
+      ```
+    * Install and Start the Runner: 
+      * Install the runner as a service to ensure it starts automatically and runs in the background.
+      ```bash
+      ./run.sh
+      √ Connected to GitHub
+      Current runner version: '2.322.0'
+      2025-02-20 01:17:56Z: Listening for Jobs
+      ```
+    * The runner is now connected to the GitHub repository and ready to execute jobs
+    * Go to the Runners tab and we can see the runner connected
