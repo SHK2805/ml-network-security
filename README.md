@@ -25,6 +25,8 @@
 - [App](#app)
 - [Docker](#docker)
 - [GitHub Actions](#github-actions)
+- [App on AWS](#app-on-aws)
+- [Clean Up](#clean-up)
 
 
 ## Notes
@@ -867,4 +869,22 @@ newgrp docker
       2025-02-20 01:17:56Z: Listening for Jobs
       ```
     * The runner is now connected to the GitHub repository and ready to execute jobs
-    * Go to the Runners tab and we can see the runner connected
+    * Go to the Runners tab, and we can see the runner connected
+
+## App on AWS
+* The app is deployed on AWS using the EC2 instance and the ECR repository
+* Access the app using the public IP address of the EC2 instance and the port given in the `app.py` file
+* Here http://<publicdns>:8000/docs
+#### Logs
+* To see the logs of the app, use the below command
+* Log on to the EC2 instance
+```bash
+docker ps
+docker logs <container_id>
+```
+
+## Clean Up
+* Clean up the below resources
+  * Delete the cloudformation stack
+  * Delete the mondoDB cluster
+  * [Optional] Disable the GitHub Actions workflow
