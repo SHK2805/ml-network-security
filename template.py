@@ -51,7 +51,7 @@ def create_project_structure(project_name: str) -> bool:
             # cloud
             f"src/{project_name}/cloud/__init__.py",
             f"src/{project_name}/cloud/deploy.py",
-            f"src/{project_name}/cloud/s3_create.yaml",
+            f"src/{project_name}/cloud/cloudformation_template.yaml",
             # logging
             f"src/{project_name}/logging/__init__.py",
             f"src/{project_name}/logging/logger.py",
